@@ -1,24 +1,28 @@
-// const jwt = require("jsonwebtoken");
-// const respon = require("../utils/helpers");
-//
-// exports.verifyToken = (req, res, next) => {
-//   // Ambil token dari header Authorization
-//   const token = req.headers.authorization?.split(" ")[1];
-//
-//   if (!token) {
-//     // Jika tidak ada token, kirim respons error
-//     return respon.responseErr(res, 401, "No token provided", "")
-//   }
-//
-//   // Verifikasi token menggunakan JWT
-//   jwt.verify(token, "secret-key", (err, decoded) => {
-//     if (err) {
-//       // Jika token tidak valid, kirim respons error
-//       return respon.responseErr(res, 401, "Invalid token", "")
-//     }
-//
-//     // Jika token valid, simpan data pengguna ke dalam request
-//     req.user = decoded;
-//     next();
-//   });
-// };
+const jwt = require('jsonwebtoken');
+const respon = require('../utils/responseHelpers');
+
+const mid = {};
+
+mid.verifyToken = (req, res, next) => {
+    const authHeader = req.header('Authorization');
+    if (!authHeader) {
+        return respon.responseErr(res, 'Authorization is needed', 401);
+    }
+
+    const token = authHeader.split(' ')[1];
+    if (!token) {
+        return respon.responseErr(res, 'Token is missing', 401);
+    }
+
+    try {
+        req.user = jwt.verify(token, process.env.JWT_SECRET);
+
+        next();
+    } catch (error) {
+        return respon.responseErr(res, 'Invalid token', 401);
+    }
+};
+
+
+
+module.exports = mid;

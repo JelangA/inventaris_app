@@ -1,7 +1,3 @@
-const extras = {
-    url: "https://reqres.in/#support-heading",
-    text: "To keep ReqRes free, contributions towards server costs are appreciated!",
-};
 
 respon = {};
 
@@ -27,8 +23,6 @@ respon.validateFields = (body) => {
     }
     return errors;
 };
-
-
 
 
 module.exports = respon;
