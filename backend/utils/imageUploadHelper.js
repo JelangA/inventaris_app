@@ -19,7 +19,7 @@ const uploadImage = (image, req) => {
 
         const fileName = image.name.replace(/ /g, '_');
         const url = `${req.protocol}://${req.get("host")}/images/${fileName}`;
-        const imagePath = path.join(__dirname, "../../public/images/", fileName);
+        const imagePath = path.join(__dirname, "../public/images/", fileName);
 
         // Ensure that the directory exists
         if (!fs.existsSync(path.dirname(imagePath))) {

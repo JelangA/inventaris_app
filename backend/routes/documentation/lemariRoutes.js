@@ -395,3 +395,5 @@ router.put("/:id", lemariController.update);
  */
 router.delete("/:id", lemariController.delete);
 
+module.exports = router;
+
