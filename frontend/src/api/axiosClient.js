@@ -1,12 +1,16 @@
 import axios from 'axios';
 
 const axiosClient = axios.create({
-    baseURL: 'http://localhost:8000/api', // TODO: Change this to the actual API URL
+    baseURL: 'http://localhost:3000/api', // TODO: Change this to the actual API URL
 });
 
 axiosClient.interceptors.request.use((config) => {
-    const token = localStorage.getItem('ACCESS_TOKEN');
-    config.headers.Authorization = `Bearer ${token}`;
+    if (!config.url.includes('/register') && !config.url.includes('/login')) {
+        const token = sessionStorage.getItem('token');
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+    }
     return config;
 });
 
@@ -17,7 +21,8 @@ axiosClient.interceptors.response.use(
     (error) => {
         const { response } = error;
         if (response.status === 401) {
-            localStorage.removeItem('ACCESS_TOKEN');
+            sessionStorage.removeItem('token');
+            sessionStorage.removeItem('user');
         }
         throw error;
     }

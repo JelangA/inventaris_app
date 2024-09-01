@@ -2,28 +2,22 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import DataTable from "../components/DataTable.jsx";
 import { dataLemari } from "../api/ruanganApiTest.js";
+import { useStateContext } from '../contexts/ContextProvider.jsx';
+import { getDataJurusan } from '../api/jurusanApi.js';
 
 function JurusanPage() {
     const { namaJurusanSlug } = useParams();
-    const [jurusan, setJurusan] = useState(null);
+    const { jurusan } = useStateContext();
+    const [jurusanDetail, setJurusanDetail] = useState(null);
 
     useEffect(() => {
-        const fetchRuanganDetail = async () => {
-            try {
-                const data = JSON.parse(sessionStorage.getItem('jurusanData')) || [];
-                const jurusanDetail = data.find(item =>
-                    item.jurusan.toLowerCase() === namaJurusanSlug
-                );
-                setJurusan(jurusanDetail);
-            } catch (error) {
-                console.error('Error fetching jurusan detail:', error);
-            }
-        };
+        console.log(jurusan);
+        if (jurusan) {
+            setJurusanDetail(jurusan.find(item => item.jurusan.toLowerCase().replace(/ /g, '-') === namaJurusanSlug));
+        }
+    }, [namaJurusanSlug, jurusan]);
 
-        fetchRuanganDetail();
-    }, [namaJurusanSlug]);
-
-    if (!jurusan) {
+    if (!jurusanDetail) {
         return <div>Loading...</div>;
     }
 
@@ -33,12 +27,12 @@ function JurusanPage() {
                 <div className="container-fluid">
                     <div className="row mb-2">
                         <div className="col-sm-6">
-                            <h1>Data Lemari Jurusan {jurusan.jurusan}</h1>
+                            <h1>Data Lemari Jurusan {jurusanDetail.jurusan}</h1>
                         </div>
                         <div className="col-sm-6">
                             <ol className="breadcrumb float-sm-right">
                                 <li className="breadcrumb-item"><Link to='/'>Home</Link></li>
-                                <li className="breadcrumb-item active">{jurusan.jurusan}</li>
+                                <li className="breadcrumb-item active">{jurusanDetail.jurusan}</li>
                             </ol>
                         </div>
                     </div>
@@ -61,7 +55,7 @@ function JurusanPage() {
                                                         readOnly
                                                         className="form-control-plaintext"
                                                         id="namaRuangan"
-                                                        value={jurusan.jurusan}
+                                                        value={jurusanDetail.jurusan}
                                                         disabled
                                                     />
                                                 </div>

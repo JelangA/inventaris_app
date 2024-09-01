@@ -7,9 +7,9 @@ import { useStateContext } from '../contexts/ContextProvider';
 
 const Layout = () => {
     const { token } = useStateContext();
-    // if (!token) {
-    //     return <Navigate to='login' />
-    // }
+    if (!token) {
+        return <Navigate to='/login' />
+    }
     return (
         <div className="wrapper">
             <Header />

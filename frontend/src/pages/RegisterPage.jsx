@@ -1,13 +1,15 @@
+import axios from 'axios';
 import { useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import axiosClient from '../api/axiosClient';
 
 export default function RegisterPage() {
 	const [showPassword, setShowPassword] = useState(false);
 	const [formData, setFormData] = useState({
 		username: '',
-		nama: '',
-		nomor: '',
-		tipe: '0',
+		name: '',
+		no_hp: '',
+		tipe_user: '0',
 		password: '',
 		passwordConfirm: '',
 	});
@@ -49,20 +51,20 @@ export default function RegisterPage() {
 			inputUsernameRef.current.classList.add('is-invalid');
 			newErrors.username = 'Username tidak boleh kosong';
 		}
-		if (!formData.nama.trim()) {
+		if (!formData.name.trim()) {
 			formIsValid = false;
 			inputNamaRef.current.classList.add('is-invalid');
-			newErrors.nama = 'Nama tidak boleh kosong';
+			newErrors.name = 'Nama tidak boleh kosong';
 		}
-		if (!formData.nomor.trim()) {
+		if (!formData.no_hp.trim()) {
 			formIsValid = false;
 			inputNomorRef.current.classList.add('is-invalid');
-			newErrors.nomor = 'Nomor HP tidak boleh kosong';
+			newErrors.no_hp = 'Nomor HP tidak boleh kosong';
 		}
-		if (formData.tipe === '0') {
+		if (formData.tipe_user === '0') {
 			formIsValid = false;
 			inputTipeRef.current.classList.add('is-invalid');
-			newErrors.tipe = 'Pilih Tipe User';
+			newErrors.tipe_user = 'Pilih Tipe User';
 		}
 		if (!formData.password.trim()) {
 			formIsValid = false;
@@ -88,9 +90,20 @@ export default function RegisterPage() {
 	const onSubmit = (e) => {
 		e.preventDefault();
 		if (validateForm()) {
-			// Handle Form Submission
-			console.log('Form Submitted:', formData);
-			navigate('/');
+			const payload = {
+				username: formData.username,
+				name: formData.name,
+				no_hp: formData.no_hp,
+				tipe_user: formData.tipe_user,
+				password: formData.password,	
+			}
+			axiosClient.post('/register', payload).then(res => {
+				console.log('Form Submitted:', formData);
+				console.log(res);
+				navigate('/login');
+			}).catch(err => {
+				console.log(err);
+			})
 		}
 	}
 
@@ -127,37 +140,37 @@ export default function RegisterPage() {
 										className="form-control"
 										id="inputNama"
 										type="text"
-										name='nama'
+										name='name'
 										ref={inputNamaRef}
-										value={formData.nama}
+										value={formData.name}
 										placeholder='Nama'
 										onChange={(e) => handleInputChange(e, inputNamaRef)}
 									/>
 									<label htmlFor="inputNama">Nama</label>
-									{errors.nama && <p style={{ color: 'red', fontSize: 13 }}>{errors.nama}</p>}
+									{errors.name && <p style={{ color: 'red', fontSize: 13 }}>{errors.name}</p>}
 								</div>
 								<div className="form-floating mb-3">
 									<input
 										className="form-control"
 										id="inputNomor"
 										type="tel"
-										name='nomor'
+										name='no_hp'
 										ref={inputNomorRef}
-										value={formData.nomor}
+										value={formData.no_hp}
 										placeholder='Nomor HP'
 										onChange={(e) => handleInputChange(e, inputNomorRef)}
 									/>
 									<label htmlFor="inputNomor">Nomor HP</label>
-									{errors.nomor && <p style={{ color: 'red', fontSize: 13 }}>{errors.nomor}</p>}
+									{errors.no_hp && <p style={{ color: 'red', fontSize: 13 }}>{errors.no_hp}</p>}
 								</div>
 								<div className="form-floating mb-3">
 									<select
 										className="form-select"
 										id="inputTipe"
 										ref={inputTipeRef}
-										value={formData.tipe}
+										value={formData.tipe_user}
 										onChange={(e) => handleInputChange(e, inputTipeRef)}
-										name='tipe'>
+										name='tipe_user'>
 										<option value="0" disabled>
 											Pilih Opsi
 										</option>
@@ -171,7 +184,7 @@ export default function RegisterPage() {
 										</option>
 									</select>
 									<label htmlFor="inputTipe">Tipe User</label>
-									{errors.tipe && <p style={{ color: 'red', fontSize: 13 }}>{errors.tipe}</p>}
+									{errors.tipe_user && <p style={{ color: 'red', fontSize: 13 }}>{errors.tipe_user}</p>}
 								</div>
 								<div className="row mb-3">
 									<div className="col-md-6">

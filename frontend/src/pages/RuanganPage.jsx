@@ -2,12 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import DataTable from "../components/DataTable.jsx";
 import { dataBarang } from "../api/ruanganApiTest.js";
+import axiosClient from "../api/axiosClient.js";
 
 function RuanganPage() {
     const { namaRuanganSlug } = useParams();
     const [ruangan, setRuangan] = useState(null);
 
     useEffect(() => {
+        // axiosClient.get(`/ruangan/${namaRuanganSlug}`)
         const fetchRuanganDetail = async () => {
             try {
                 const data = JSON.parse(sessionStorage.getItem('ruanganData')) || [];

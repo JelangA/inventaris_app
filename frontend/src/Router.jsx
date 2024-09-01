@@ -39,14 +39,6 @@ const routes = createBrowserRouter([
                 element: <Jurusan />,
             },
             {
-                path: '/master/jurusan',
-                element: (
-                    <ProtectedRoute allowedRoles={['admin', 'kep_jurusan']}>
-                      <MasterPage />
-                    </ProtectedRoute>
-                )
-            },
-            {
                 path: '/master/:param',
                 element: (
                     <ProtectedRoute allowedRoles={['admin']}>

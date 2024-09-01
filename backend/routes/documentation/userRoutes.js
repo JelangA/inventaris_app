@@ -1,4 +1,6 @@
 const userController = require('../../controllers/repository/userRepository');
+const User = require("../../models/user");
+const respon = require("../../utils/responseHelpers");
 const express = require("express");
 const middleware = require("../../middleware/authMiddleware");
 const router =  express.Router();
@@ -97,7 +99,7 @@ const router =  express.Router();
  *                   type: string
  *                   example: "Internal Server Error"
  */
-router.get('/user', userController.getAll);
+router.get('/', userController.getAll);
 
 /**
  * @swagger
@@ -193,7 +195,7 @@ router.get('/user', userController.getAll);
  *                   type: string
  *                   example: "Internal Server Error"
  */
-router.post('/user', userController.create);
+router.post('/', userController.create);
 
 /**
  * @swagger
@@ -257,7 +259,7 @@ router.post('/user', userController.create);
  *                   type: string
  *                   example: "Internal Server Error"
  */
-router.get('/user/:id', userController.getById);
+router.get('/:id', userController.getById);
 
 /**
  * @swagger
@@ -364,7 +366,7 @@ router.get('/user/:id', userController.getById);
  *                   type: string
  *                   example: "Internal Server Error"
  */
-router.put('/user/:id', userController.update);
+router.put('/:id', userController.update);
 
 /**
  * @swagger
@@ -416,7 +418,7 @@ router.put('/user/:id', userController.update);
  *                   type: string
  *                   example: "Internal Server Error"
  */
-router.delete('/user/:id', userController.delete);
+router.delete('/:id', userController.delete);
 
 /**
  * @swagger
