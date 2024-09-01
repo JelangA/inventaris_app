@@ -1,8 +1,7 @@
-// eslint-disable-next-line no-unused-vars
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import DataTable from "../components/DataTable.jsx";
-import ruanganData from "../api/ruanganApiTest.js";
+import { dataBarang } from "../api/ruanganApiTest.js";
 
 function RuanganPage() {
     const { namaRuanganSlug } = useParams();
@@ -38,7 +37,7 @@ function RuanganPage() {
                         </div>
                         <div className="col-sm-6">
                             <ol className="breadcrumb float-sm-right">
-                                <li className="breadcrumb-item"><a href="#">Home</a></li>
+                                <li className="breadcrumb-item"><Link to='/'>Home</Link></li>
                                 <li className="breadcrumb-item active">{ruangan.nama_ruangan}</li>
                             </ol>
                         </div>
@@ -97,7 +96,7 @@ function RuanganPage() {
                                     </div>
                                 </div>
                                 <div className="card-body">
-                                    <DataTable data={ruanganData} />
+                                    <DataTable data={dataBarang} type={'barang'} />
                                 </div>
                             </div>
                         </div>
