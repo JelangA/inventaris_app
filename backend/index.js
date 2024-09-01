@@ -1,5 +1,6 @@
 const express = require("express");
 const routes = require('./routes/indexRoutes');
+const cors = require('cors');
 const helmet = require("helmet");
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./config/swagger');
@@ -7,6 +8,12 @@ require("dotenv").config();
 const fileUpload = require('express-fileupload');
 
 const app = express();
+
+app.use(cors({
+    origin: 'http://localhost:5173', // Hanya mengizinkan permintaan dari localhost:5173
+    methods: ['GET', 'POST', 'DELETE', 'PUT'], // Metode HTTP yang diizinkan
+    allowedHeaders: ['Content-Type', 'Authorization'], // Header yang diizinkan
+  }));
 
 // Use Helmet for security headers
 app.use(helmet());

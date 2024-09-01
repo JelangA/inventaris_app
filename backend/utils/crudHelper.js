@@ -9,7 +9,8 @@ const {handleSequelizeError} = require("./errorHandler");
  */
 const createItem = async (Model, data, res) => {
     try {
-        const item = await Model.create(data);
+        const { id, ...filteredData } = data
+        const item = await Model.create(filteredData);
         return response(res, item, 201);
     } catch (error) {
         console.log(error);

@@ -15,11 +15,54 @@ import {
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import {
+	addDataJurusan,
+	editDataJurusan,
+	deleteDataJurusan,
+} from "../api/jurusanApi.js";
+import {
+	addDataBarang,
+	editDataBarang,
+	deleteDataBarang,
+} from "../api/barangApi.js";
+import {
+	addDataRuangan,
+	editDataRuangan,
+	deleteDataRuangan,
+} from "../api/ruanganApi.js";
+import {
+	addDataLemari,
+	editDataLemari,
+	deleteDataLemari,
+} from "../api/lemariApi.js";
+import { addDataUser, editDataUser, deleteDataUser } from "../api/userApi.js";
+import { addDataPengadaan } from "../api/pengadaanApi.js";
 
-const DataTable = ({ data, type }) => {
+const DataTable = ({ data, setData, type, role }) => {
 	const [validationErrors, setValidationErrors] = useState({});
 
-    let tableColumns = [];
+	const jurusanColumns = [
+		{
+			accessorKey: "id",
+			header: "ID",
+			enableEditing: false,
+			size: 80,
+		},
+		{
+			accessorKey: "jurusan",
+			header: "Jurusan",
+			muiEditTextFieldProps: {
+				required: true,
+				error: !!validationErrors?.jurusan,
+				helperText: validationErrors?.jurusan,
+				onFocus: () =>
+					setValidationErrors({
+						...validationErrors,
+						jurusan: undefined,
+					}),
+			},
+		},
+	];
 
 	const barangColumns = [
 		{
@@ -34,12 +77,12 @@ const DataTable = ({ data, type }) => {
 			enableEditing: false,
 			muiEditTextFieldProps: {
 				required: true,
-				error: !!validationErrors?.name,
-				helperText: validationErrors?.name,
+				error: !!validationErrors?.no_inventaris,
+				helperText: validationErrors?.no_inventaris,
 				onFocus: () =>
 					setValidationErrors({
 						...validationErrors,
-						name: undefined,
+						no_inventaris: undefined,
 					}),
 			},
 		},
@@ -48,12 +91,12 @@ const DataTable = ({ data, type }) => {
 			header: "Jenis",
 			muiEditTextFieldProps: {
 				required: true,
-				error: !!validationErrors?.name,
-				helperText: validationErrors?.name,
+				error: !!validationErrors?.jenis_sarana,
+				helperText: validationErrors?.jenis_sarana,
 				onFocus: () =>
 					setValidationErrors({
 						...validationErrors,
-						name: undefined,
+						jenis_sarana: undefined,
 					}),
 			},
 		},
@@ -62,12 +105,12 @@ const DataTable = ({ data, type }) => {
 			header: "Nama",
 			muiEditTextFieldProps: {
 				required: true,
-				error: !!validationErrors?.name,
-				helperText: validationErrors?.name,
+				error: !!validationErrors?.nama_barang,
+				helperText: validationErrors?.nama_barang,
 				onFocus: () =>
 					setValidationErrors({
 						...validationErrors,
-						name: undefined,
+						nama_barang: undefined,
 					}),
 			},
 		},
@@ -81,12 +124,12 @@ const DataTable = ({ data, type }) => {
 			header: "Spesifikasi",
 			muiEditTextFieldProps: {
 				required: true,
-				error: !!validationErrors?.name,
-				helperText: validationErrors?.name,
+				error: !!validationErrors?.spesifikasi,
+				helperText: validationErrors?.spesifikasi,
 				onFocus: () =>
 					setValidationErrors({
 						...validationErrors,
-						name: undefined,
+						spesifikasi: undefined,
 					}),
 			},
 		},
@@ -95,12 +138,12 @@ const DataTable = ({ data, type }) => {
 			header: "Satuan",
 			muiEditTextFieldProps: {
 				required: true,
-				error: !!validationErrors?.name,
-				helperText: validationErrors?.name,
+				error: !!validationErrors?.satuan,
+				helperText: validationErrors?.satuan,
 				onFocus: () =>
 					setValidationErrors({
 						...validationErrors,
-						name: undefined,
+						satuan: undefined,
 					}),
 			},
 		},
@@ -109,12 +152,12 @@ const DataTable = ({ data, type }) => {
 			header: "Jumlah Layak Pakai",
 			muiEditTextFieldProps: {
 				required: true,
-				error: !!validationErrors?.name,
-				helperText: validationErrors?.name,
+				error: !!validationErrors?.jml_layak_pakai,
+				helperText: validationErrors?.jml_layak_pakai,
 				onFocus: () =>
 					setValidationErrors({
 						...validationErrors,
-						name: undefined,
+						jml_layak_pakai: undefined,
 					}),
 			},
 		},
@@ -123,12 +166,12 @@ const DataTable = ({ data, type }) => {
 			header: "Jumlah Tidak Layak Pakai",
 			muiEditTextFieldProps: {
 				required: true,
-				error: !!validationErrors?.name,
-				helperText: validationErrors?.name,
+				error: !!validationErrors?.jml_tidak_layak_pakai,
+				helperText: validationErrors?.jml_tidak_layak_pakai,
 				onFocus: () =>
 					setValidationErrors({
 						...validationErrors,
-						name: undefined,
+						jml_tidak_layak_pakai: undefined,
 					}),
 			},
 		},
@@ -137,12 +180,12 @@ const DataTable = ({ data, type }) => {
 			header: "Sumber",
 			muiEditTextFieldProps: {
 				required: true,
-				error: !!validationErrors?.name,
-				helperText: validationErrors?.name,
+				error: !!validationErrors?.sumber,
+				helperText: validationErrors?.sumber,
 				onFocus: () =>
 					setValidationErrors({
 						...validationErrors,
-						name: undefined,
+						sumber: undefined,
 					}),
 			},
 		},
@@ -151,12 +194,12 @@ const DataTable = ({ data, type }) => {
 			header: "Pengadaan",
 			muiEditTextFieldProps: {
 				required: true,
-				error: !!validationErrors?.name,
-				helperText: validationErrors?.name,
+				error: !!validationErrors?.pengadaan,
+				helperText: validationErrors?.pengadaan,
 				onFocus: () =>
 					setValidationErrors({
 						...validationErrors,
-						name: undefined,
+						pengadaan: undefined,
 					}),
 			},
 		},
@@ -174,12 +217,12 @@ const DataTable = ({ data, type }) => {
 			header: "Nama Ruangan",
 			muiEditTextFieldProps: {
 				required: true,
-				error: !!validationErrors?.name,
-				helperText: validationErrors?.name,
+				error: !!validationErrors?.nama_ruangan,
+				helperText: validationErrors?.nama_ruangan,
 				onFocus: () =>
 					setValidationErrors({
 						...validationErrors,
-						name: undefined,
+						nama_ruangan: undefined,
 					}),
 			},
 		},
@@ -188,12 +231,12 @@ const DataTable = ({ data, type }) => {
 			header: "Luas Ruangn",
 			muiEditTextFieldProps: {
 				required: true,
-				error: !!validationErrors?.name,
-				helperText: validationErrors?.name,
+				error: !!validationErrors?.luas_ruangan,
+				helperText: validationErrors?.luas_ruangan,
 				onFocus: () =>
 					setValidationErrors({
 						...validationErrors,
-						name: undefined,
+						luas_ruangan: undefined,
 					}),
 			},
 		},
@@ -207,6 +250,71 @@ const DataTable = ({ data, type }) => {
 			header: "Inventaris Sapras",
 			muiEditTextFieldProps: {
 				required: true,
+				error: !!validationErrors?.inventaris_sapras,
+				helperText: validationErrors?.inventaris_sapras,
+				onFocus: () =>
+					setValidationErrors({
+						...validationErrors,
+						inventaris_sapras: undefined,
+					}),
+			},
+		},
+	];
+
+	const lemariColumns = [
+		{
+			accessorKey: "id",
+			header: "ID",
+			enableEditing: false,
+			size: 80,
+		},
+		{
+			accessorKey: "no_lemari",
+			header: "No Lemari",
+			enableEditing: true,
+			muiEditTextFieldProps: {
+				required: true,
+				error: !!validationErrors?.no_lemari,
+				helperText: validationErrors?.no_lemari,
+				onFocus: () =>
+					setValidationErrors({
+						...validationErrors,
+						no_lemari: undefined,
+					}),
+			},
+		},
+		{
+			accessorKey: "id_jurusan",
+			header: "ID Jurusan",
+			enableEditing: false,
+			muiEditTextFieldProps: {
+				required: true,
+				error: !!validationErrors?.id_jurusan,
+				helperText: validationErrors?.id_jurusan,
+				onFocus: () =>
+					setValidationErrors({
+						...validationErrors,
+						id_jurusan: undefined,
+					}),
+			},
+		},
+	];
+
+	const userColumns = [
+		{
+			accessorKey: "id",
+			header: "ID",
+			enableEditing: false,
+			size: 80,
+			muiEditTextFieldProps: {
+
+			}
+		},
+		{
+			accessorKey: "name",
+			header: "Nama",
+			muiEditTextFieldProps: {
+				required: true,
 				error: !!validationErrors?.name,
 				helperText: validationErrors?.name,
 				onFocus: () =>
@@ -216,157 +324,233 @@ const DataTable = ({ data, type }) => {
 					}),
 			},
 		},
+		{
+			accessorKey: "username",
+			header: "Username",
+			muiEditTextFieldProps: {
+				required: true,
+				error: !!validationErrors?.username,
+				helperText: validationErrors?.username,
+				onFocus: () =>
+					setValidationErrors({
+						...validationErrors,
+						username: undefined,
+					}),
+			},
+		},
+		{
+			accessorKey: "tipe_user",
+			header: "Tipe User",
+			muiEditTextFieldProps: {
+				required: true,
+				error: !!validationErrors?.tipe_user,
+				helperText: validationErrors?.tipe_user,
+				onFocus: () =>
+					setValidationErrors({
+						...validationErrors,
+						tipe_user: undefined,
+					}),
+			},
+		},
+		{
+			accessorKey: "no_hp",
+			header: "No HP",
+			muiEditTextFieldProps: {
+				required: true,
+				error: !!validationErrors?.no_hp,
+				helperText: validationErrors?.no_hp,
+				onFocus: () =>
+					setValidationErrors({
+						...validationErrors,
+						no_hp: undefined,
+					}),
+			},
+		},
+		{
+			accessorKey: "password",
+			header: "Password",
+			muiEditTextFieldProps: {
+				required: true,
+				error: !!validationErrors?.password,
+				helperText: validationErrors?.password,
+				onFocus: () =>
+					setValidationErrors({
+						...validationErrors,
+						password: undefined,
+					}),
+			},
+		},
 	];
 
-    const lemariColumns = [
-        {
-            accessorKey: 'id',
-            header: 'ID',
-            enableEditing: false,
-            size: 80
-        },
-        {
-            accessorKey: 'no_lemari',
-            header: 'No Lemari',
-            enableEditing: true,
-            muiEditTextFieldProps: {
-                required: true,
-                error: !!validationErrors?.name,
-                helperText: validationErrors?.name,
-                onFocus: () =>
-                    setValidationErrors({
-                        ...validationErrors,
-                        name: undefined,
-                    }),
-            },
-        },
-        {
-            accessorKey: 'id_jurusan',
-            header: 'ID Jurusan',
-            enableEditing: false,
-            muiEditTextFieldProps: {
-                required: true,
-                error: !!validationErrors?.name,
-                helperText: validationErrors?.name,
-                onFocus: () =>
-                    setValidationErrors({
-                        ...validationErrors,
-                        name: undefined,
-                    }),
-            },
-        },
-    ]
+	const pengadaanColumns = [
+		{
+			accessorKey: "id",
+			header: "ID",
+			enableEditing: false,
+			size: 80,
+		},
+		{
+			accessorKey: "no_inventaris",
+			header: "No Inventaris",
+			enableEditing: true,
+			muiEditTextFieldProps: {
+				required: true,
+				error: !!validationErrors?.no_inventaris,
+				helperText: validationErrors?.no_inventaris,
+				onFocus: () =>
+					setValidationErrors({
+						...validationErrors,
+						no_inventaris: undefined,
+					}),
+			},
+		},
+		{
+			accessorKey: "stok_asal",
+			header: "Stok Asal",
+			enableEditing: true,
+			muiEditTextFieldProps: {
+				required: true,
+				error: !!validationErrors?.stok_asal,
+				helperText: validationErrors?.stok_asal,
+				onFocus: () =>
+					setValidationErrors({
+						...validationErrors,
+						stok_asal: undefined,
+					}),
+			},
+		},
+		{
+			accessorKey: "jumlah",
+			header: "Jumlah",
+			enableEditing: true,
+			muiEditTextFieldProps: {
+				required: true,
+				error: !!validationErrors?.jumlah,
+				helperText: validationErrors?.jumlah,
+				onFocus: () =>
+					setValidationErrors({
+						...validationErrors,
+						jumlah: undefined,
+					}),
+			},
+		},
+		{
+			accessorKey: "tipe_pengadaan",
+			header: "Tipe Pengadaan",
+			enableEditing: true,
+			muiEditTextFieldProps: {
+				required: true,
+				error: !!validationErrors?.tipe_pengadaan,
+				helperText: validationErrors?.tipe_pengadaan,
+				onFocus: () =>
+					setValidationErrors({
+						...validationErrors,
+						tipe_pengadaan: undefined,
+					}),
+			},
+		},
+		{
+			accessorKey: "tanggal",
+			header: "Tanggal",
+			enableEditing: true,
+			muiEditTextFieldProps: {
+				required: true,
+				error: !!validationErrors?.tanggal,
+				helperText: validationErrors?.tanggal,
+				onFocus: () =>
+					setValidationErrors({
+						...validationErrors,
+						tanggal: undefined,
+					}),
+			},
+		},
+	];
 
-    const userColumns = [
-        {
-            accessorKey: 'id',
-            header: 'ID',
-            enableEditing: false,
-            size: 80
-        },
-        {
-            accessorKey: 'name',
-            header: 'Nama',
-            muiEditTextFieldProps: {
-                required: true,
-                error: !!validationErrors?.name,
-                helperText: validationErrors?.name,
-                onFocus: () =>
-                    setValidationErrors({
-                        ...validationErrors,
-                        name: undefined,
-                    }),
-            },
-        },
-        {
-            accessorKey: 'username',
-            header: 'Username',
-            muiEditTextFieldProps: {
-                required: true,
-                error: !!validationErrors?.name,
-                helperText: validationErrors?.name,
-                onFocus: () =>
-                    setValidationErrors({
-                        ...validationErrors,
-                        name: undefined,
-                    }),
-            },
-        },
-        {
-            accessorKey: 'password',
-            header: 'Password',
-            muiEditTextFieldProps: {
-                required: true,
-                error: !!validationErrors?.name,
-                helperText: validationErrors?.name,
-                onFocus: () =>
-                    setValidationErrors({
-                        ...validationErrors,
-                        name: undefined,
-                    }),
-            },
-        },
-        {
-            accessorKey: 'tipe_user',
-            header: 'Tipe User',
-            muiEditTextFieldProps: {
-                required: true,
-                error: !!validationErrors?.name,
-                helperText: validationErrors?.name,
-                onFocus: () =>
-                    setValidationErrors({
-                        ...validationErrors,
-                        name: undefined,
-                    }),
-            },
-        },
-        {
-            accessorKey: 'no_hp',
-            header: 'No HP',
-            muiEditTextFieldProps: {
-                required: true,
-                error: !!validationErrors?.name,
-                helperText: validationErrors?.name,
-                onFocus: () =>
-                    setValidationErrors({
-                        ...validationErrors,
-                        name: undefined,
-                    }),
-            },
-        },
-    ]
+	const tableMemo = useMemo(() => {
+		let tableType = {
+			columns: [],
+			createFunction: () => {},
+			editFunction: () => {},
+			deleteFunction: () => {},
+		};
 
-	switch (type) {
-		case "barang":
-			tableColumns = barangColumns;
-			break;
-		case "ruangan":
-			tableColumns = ruanganColumns;
-			break;
-		case "lemari":
-			tableColumns = lemariColumns;
-			break;
-		case "user":
-			tableColumns = userColumns;
-			break;
-	}
+		switch (type) {
+			case "jurusan":
+				tableType.columns = jurusanColumns;
+				tableType.createFunction = addDataJurusan;
+				tableType.editFunction = editDataJurusan;
+				tableType.deleteFunction = deleteDataJurusan;
+				break;
+			case "barang":
+				tableType.columns = barangColumns;
+				tableType.createFunction = addDataBarang;
+				tableType.editFunction = editDataBarang;
+				tableType.deleteFunction = deleteDataBarang;
+				break;
+			case "ruangan":
+				tableType.columns = ruanganColumns;
+				tableType.createFunction = addDataRuangan;
+				tableType.editFunction = editDataRuangan;
+				tableType.deleteFunction = deleteDataRuangan;
+				break;
+			case "lemari":
+				tableType.columns = lemariColumns;
+				tableType.createFunction = addDataLemari;
+				tableType.editFunction = editDataLemari;
+				tableType.deleteFunction = deleteDataLemari;
+				break;
+			case "user":
+				tableType.columns = userColumns;
+				tableType.createFunction = addDataUser;
+				tableType.editFunction = editDataUser;
+				tableType.deleteFunction = deleteDataUser;
+				break;
+			case "pengadaan":
+				tableType.columns = pengadaanColumns;
+				tableType.createFunction = addDataPengadaan;
+				break;
+			default:
+				tableType.columns = [];
+		}
 
-	const columns = useMemo(() => tableColumns, [validationErrors]);
+		return tableType;
+	}, [type, validationErrors]);
+
+	const columns = tableMemo.columns;
 
 	const table = useMaterialReactTable({
 		columns,
 		data,
 		createDisplayMode: "modal",
-		editDisplayMode: "modal",
+		editDisplayMode: "row",
 		enableEditing: true,
 		getRowId: (row) => row.id,
 		onCreatingRowCancel: () => setValidationErrors({}),
 		onCreatingRowSave: async ({ values, table }) => {
 			// Tambahkan logika simpan
+			let newData;
+			await tableMemo.createFunction(values).then((res) => {
+				console.log(res);
+				newData = res.data.data;
+				setData((prevData) => [...prevData, newData]);
+			});
+			table.setCreatingRow(null);
+			if (type === 'jurusan' || type === 'ruangan') {
+				window.location.reload();
+			}
 		},
 		onEditingRowCancel: () => setValidationErrors({}),
 		onEditingRowSave: async ({ values, table }) => {
 			// Tambahkan logika simpan
+			await tableMemo.editFunction(values.id, values).then(() => {
+				setData((prevData) =>
+					prevData.map((dataElement) => (dataElement.id === values.id ? values : dataElement))
+				);
+			});
+			if (type === 'jurusan' || type === 'ruangan') {
+				window.location.reload();
+			}
+			table.setEditingRow(null);
 		},
 		renderRowActions: ({ row, table }) => (
 			<Box sx={{ display: "flex", gap: "1rem" }}>
@@ -378,13 +562,20 @@ const DataTable = ({ data, type }) => {
 				<Tooltip title="Delete">
 					<IconButton
 						color="error"
-						onClick={() => {
+						onClick={async () => {
 							if (
 								window.confirm(
 									"Are you sure you want to delete this row?"
 								)
 							) {
-								// Tambahkan logika hapus
+								await tableMemo.deleteFunction(row.id).then(() => {
+									setData((prevData) =>
+										prevData.filter((r) => r.id !== row.id)
+									);
+								});
+								if (type === 'jurusan' || type === 'ruangan') {
+									window.location.reload();
+								}
 							}
 						}}>
 						<DeleteIcon />
@@ -397,7 +588,7 @@ const DataTable = ({ data, type }) => {
 				<Button
 					variant="contained"
 					onClick={() => table.setCreatingRow(true)}>
-					Create New Ruangan
+					Create New Row
 				</Button>
 				<Button variant="outlined" onClick={() => handlePrint()}>
 					Print

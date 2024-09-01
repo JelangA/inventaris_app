@@ -1,5 +1,7 @@
 import { useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import axiosClient from '../api/axiosClient';
+import { useStateContext } from '../contexts/ContextProvider';
 
 export default function LoginPage() {
 	const [showPassword, setShowPassword] = useState(false);
@@ -8,6 +10,7 @@ export default function LoginPage() {
 		password: ''
 	});
 	const [errors, setErrors] = useState({});
+	const { token, user, setUser, setToken } = useStateContext();
 	const inputUsernameRef = useRef(null);
 	const inputPasswordRef = useRef(null);
 	const navigate = useNavigate();
@@ -52,9 +55,26 @@ export default function LoginPage() {
 	const onSubmit = (e) => {
 		e.preventDefault();
 		if (validateForm()) {
-			// Handle Form Submission
-			console.log('Form Submitted:', formData);
-			navigate('/');
+			const payload = {
+				username: formData.username,
+				password: formData.password
+			}
+			axiosClient.post('/login', payload).then(async (res) => {
+				const newToken = res.data.data.token;
+				setToken(newToken);
+				await axiosClient.get('/profile').then(res => {
+					const newUser = res.data.data;
+					navigate('/');
+					if (!user) {
+						window.location.reload();
+					}
+					setUser(newUser);
+				}).catch(err => {
+					console.log(err);
+				});
+			}).catch(err => {
+				console.log(err);
+			});
 		}
 	}
 
