@@ -14,7 +14,11 @@ export async function getDataBarang() {
 
 export async function addDataBarang(data) {
     try {
-        const res = await axiosClient.post('/barang', data);
+        const res = await axiosClient.post('/barang', data, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        }).catch((err) => console.error("Error adding data:", err));
         return res;
     } catch (error) {
         return null;
@@ -23,7 +27,11 @@ export async function addDataBarang(data) {
 
 export async function editDataBarang(id, data) {
     try {
-        const res = await axiosClient.put(`/barang/${id}`, data);
+        const res = await axiosClient.put(`/barang/${id}`, data, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
         return res;
     } catch (error) {
         return null;
