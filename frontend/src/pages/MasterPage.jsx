@@ -7,22 +7,31 @@ import { getDataRuangan } from "../api/ruanganApi.js";
 import { getDataBarang } from "../api/barangApi.js";
 import { getDataUser } from "../api/userApi.js";
 import { getDataLemari } from "../api/lemariApi.js";
+import { useStateContext } from "../contexts/ContextProvider.jsx";
 
 function MasterPage() {
 	const { param } = useParams();
 	const type = param.toLowerCase();
+	const { jurusan, ruangan, setJurusan, setRuangan } = useStateContext();
     const [data, setData] = useState([]);
+
+	let passedData = data;
+	let passedSetData = setData;
 
 	useEffect(() => {
         const fetchData = async () => {
             let fetchedData = [];
             switch (type) {
                 case "jurusan":
+					passedData = jurusan;
+					passedSetData = setJurusan;
                     await getDataJurusan().then((res) => {
                         fetchedData = res;
                     })
                     break;
                 case "ruangan":
+					passedData = ruangan;
+					passedSetData = setRuangan;
                     await getDataRuangan().then((res) => {
                         fetchedData = res;
                     })
@@ -78,7 +87,7 @@ function MasterPage() {
 						<div className="col-12">
 							<div className="card">
 								<div className="card-body">
-									<DataTable data={data} setData={setData} type={type} />
+									<DataTable data={passedData} setData={passedSetData} type={type} />
 								</div>
 							</div>
 						</div>

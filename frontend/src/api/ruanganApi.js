@@ -14,7 +14,11 @@ export async function getDataRuangan() {
 
 export async function addDataRuangan(data) {
     try {
-        const res = await axiosClient.post('/ruangan', data);
+        const res = await axiosClient.post('/ruangan', data, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        }).catch((err) => console.error("Error adding data:", err));
         return res;
     } catch (error) {
         return null;
@@ -23,7 +27,11 @@ export async function addDataRuangan(data) {
 
 export async function editDataRuangan(id, data) {
     try {
-        const res = await axiosClient.put(`/ruangan/${id}`, data);
+        const res = await axiosClient.put(`/ruangan/${id}`, data, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
         return res;
     } catch (error) {
         return null;

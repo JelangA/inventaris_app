@@ -8,6 +8,7 @@ import Jurusan from './pages/JurusanPage';
 import Login from './pages/LoginPage';
 import Register from './pages/RegisterPage';
 import MasterPage from './pages/MasterPage';
+import FormPage from './pages/FormPage';
 
 const ProtectedRoute = ({ allowedRoles, children }) => {
     const { user } = useStateContext();
@@ -25,6 +26,14 @@ const routes = createBrowserRouter([
             {
                 path: '/',
                 element: <Home />,
+            },
+            {
+                path: '/form/:param/:id?',
+                element: (
+                    <ProtectedRoute allowedRoles={['admin', 'kep_jurusan', 'kep_bengkel']}>
+                        <FormPage />
+                    </ProtectedRoute>
+                )
             },
             {
                 path:'/ruangan/:namaRuanganSlug',
@@ -45,7 +54,7 @@ const routes = createBrowserRouter([
                       <MasterPage />
                     </ProtectedRoute>
                 )
-            }
+            },
         ],
     },
     {

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
 	MRT_EditActionButtons,
 	MaterialReactTable,
@@ -11,6 +11,8 @@ import {
 	DialogContent,
 	DialogTitle,
 	IconButton,
+	Select,
+	MenuItem,
 	Tooltip,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
@@ -37,9 +39,14 @@ import {
 } from "../api/lemariApi.js";
 import { addDataUser, editDataUser, deleteDataUser } from "../api/userApi.js";
 import { addDataPengadaan } from "../api/pengadaanApi.js";
+import axiosClient from "../api/axiosClient.js";
+import { useStateContext } from "../contexts/ContextProvider.jsx";
+import { useNavigate } from "react-router-dom";
 
 const DataTable = ({ data, setData, type, role }) => {
 	const [validationErrors, setValidationErrors] = useState({});
+	const { jurusan, setJurusan } = useStateContext();
+	const navigate = useNavigate();
 
 	const jurusanColumns = [
 		{
@@ -117,7 +124,8 @@ const DataTable = ({ data, setData, type, role }) => {
 		{
 			accessorKey: "foto_barang",
 			header: "Foto",
-			enableEditing: false,
+			enableEditing: true,
+			Cell: ({ cell }) => <img src={cell.getValue()} alt="Foto" style={{ width: '50px', height: '50px' }} />,
 		},
 		{
 			accessorKey: "spesifikasi",
@@ -228,7 +236,7 @@ const DataTable = ({ data, setData, type, role }) => {
 		},
 		{
 			accessorKey: "luas_ruangan",
-			header: "Luas Ruangn",
+			header: "Luas Ruangan",
 			muiEditTextFieldProps: {
 				required: true,
 				error: !!validationErrors?.luas_ruangan,
@@ -239,11 +247,6 @@ const DataTable = ({ data, setData, type, role }) => {
 						luas_ruangan: undefined,
 					}),
 			},
-		},
-		{
-			accessorKey: "foto_barang",
-			header: "Foto",
-			enableEditing: false,
 		},
 		{
 			accessorKey: "inventaris_sapras",
@@ -286,8 +289,9 @@ const DataTable = ({ data, setData, type, role }) => {
 		{
 			accessorKey: "id_jurusan",
 			header: "ID Jurusan",
-			enableEditing: false,
+			enableEditing: true,
 			muiEditTextFieldProps: {
+				select: true,
 				required: true,
 				error: !!validationErrors?.id_jurusan,
 				helperText: validationErrors?.id_jurusan,
@@ -296,6 +300,11 @@ const DataTable = ({ data, setData, type, role }) => {
 						...validationErrors,
 						id_jurusan: undefined,
 					}),
+				children: jurusan.map((j) => (
+					<MenuItem key={j.id} value={j.id}>
+						{j.jurusan}
+					</MenuItem>
+				)),
 			},
 		},
 	];
@@ -306,9 +315,7 @@ const DataTable = ({ data, setData, type, role }) => {
 			header: "ID",
 			enableEditing: false,
 			size: 80,
-			muiEditTextFieldProps: {
-
-			}
+			muiEditTextFieldProps: {},
 		},
 		{
 			accessorKey: "name",
@@ -341,8 +348,15 @@ const DataTable = ({ data, setData, type, role }) => {
 		{
 			accessorKey: "tipe_user",
 			header: "Tipe User",
+			editSelectOptions: [
+				"admin",
+				"kep_jurusan",
+				"kep_bengkel",
+				"staf_tu",
+			],
 			muiEditTextFieldProps: {
 				required: true,
+				select: true,
 				error: !!validationErrors?.tipe_user,
 				helperText: validationErrors?.tipe_user,
 				onFocus: () =>
@@ -535,7 +549,7 @@ const DataTable = ({ data, setData, type, role }) => {
 				setData((prevData) => [...prevData, newData]);
 			});
 			table.setCreatingRow(null);
-			if (type === 'jurusan' || type === 'ruangan') {
+			if (type === "jurusan") {
 				window.location.reload();
 			}
 		},
@@ -544,10 +558,12 @@ const DataTable = ({ data, setData, type, role }) => {
 			// Tambahkan logika simpan
 			await tableMemo.editFunction(values.id, values).then(() => {
 				setData((prevData) =>
-					prevData.map((dataElement) => (dataElement.id === values.id ? values : dataElement))
+					prevData.map((dataElement) =>
+						dataElement.id === values.id ? values : dataElement
+					)
 				);
 			});
-			if (type === 'jurusan' || type === 'ruangan') {
+			if (type === "jurusan") {
 				window.location.reload();
 			}
 			table.setEditingRow(null);
@@ -555,7 +571,7 @@ const DataTable = ({ data, setData, type, role }) => {
 		renderRowActions: ({ row, table }) => (
 			<Box sx={{ display: "flex", gap: "1rem" }}>
 				<Tooltip title="Edit">
-					<IconButton onClick={() => table.setEditingRow(row)}>
+					<IconButton onClick={['ruangan', 'barang'].includes(type) ? () => navigate(`/form/${type}/${row.id}`) : () => table.setCreatingRow(row)}>
 						<EditIcon />
 					</IconButton>
 				</Tooltip>
@@ -568,12 +584,16 @@ const DataTable = ({ data, setData, type, role }) => {
 									"Are you sure you want to delete this row?"
 								)
 							) {
-								await tableMemo.deleteFunction(row.id).then(() => {
-									setData((prevData) =>
-										prevData.filter((r) => r.id !== row.id)
-									);
-								});
-								if (type === 'jurusan' || type === 'ruangan') {
+								await tableMemo
+									.deleteFunction(row.id)
+									.then(() => {
+										setData((prevData) =>
+											prevData.filter(
+												(r) => r.id !== row.id
+											)
+										);
+									});
+								if (type === "jurusan" || type === "ruangan") {
 									window.location.reload();
 								}
 							}
@@ -587,7 +607,7 @@ const DataTable = ({ data, setData, type, role }) => {
 			<Box sx={{ display: "flex", gap: "1rem" }}>
 				<Button
 					variant="contained"
-					onClick={() => table.setCreatingRow(true)}>
+					onClick={['ruangan', 'barang'].includes(type) ? () => navigate(`/form/${type}`) : () => table.setCreatingRow(true)}>
 					Create New Row
 				</Button>
 				<Button variant="outlined" onClick={() => handlePrint()}>
