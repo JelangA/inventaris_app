@@ -5,6 +5,7 @@ const LogPengadaan = require('../models/logPengadaan');
 
 const controller = {};
 
+
 controller.pengadaanBarang = async (req, res) => {
     try {
         // Null-kan stok_asal sebelum data pengadaan diinputkan

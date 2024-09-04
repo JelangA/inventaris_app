@@ -1,6 +1,5 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
-const Barang = require('./Barang');
 
 const LogPengadaan = sequelize.define('LogPengadaan', {
   id: {
@@ -12,10 +11,6 @@ const LogPengadaan = sequelize.define('LogPengadaan', {
   no_inventaris: {
     type: DataTypes.INTEGER,
     allowNull: false,
-    references: {
-      model: Barang,
-      key: 'no_inventaris',
-    },
   },
   stok_asal: {
     type: DataTypes.INTEGER,

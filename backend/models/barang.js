@@ -13,10 +13,6 @@ const Barang = sequelize.define('Barang', {
         allowNull: false,
         unique: true,
     },
-    id_penempatan: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-    },
     jenis_sarana: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -49,7 +45,7 @@ const Barang = sequelize.define('Barang', {
         allowNull: false,
     },
     pengadaan: {
-        type: DataTypes.INTEGER, // Menggunakan INTEGER untuk YEAR
+        type: DataTypes.INTEGER,
         allowNull: false,
     },
 }, {

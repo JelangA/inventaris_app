@@ -3,14 +3,14 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('penempatan_barang', {
+    await queryInterface.createTable('penempatan_ruangan', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      id_tempat: {
+      id_ruangan: {
         type: Sequelize.INTEGER,
         allowNull: false,
       },
@@ -32,9 +32,10 @@ module.exports = {
         type: Sequelize.DATE,
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP')
       }
+
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('penempatan_barang');
+    await queryInterface.dropTable('penempatan_ruangan');
   }
 };

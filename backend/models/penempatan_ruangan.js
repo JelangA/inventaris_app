@@ -1,15 +1,14 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
 
-
-const PenempatanBarang = sequelize.define('PenempatanBarang', {
+const PenempatanRuangan = sequelize.define('PenempatanRuangan', {
     id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,
         allowNull: false,
     },
-    id_tempat: {
+    id_ruangan: {
         type: DataTypes.INTEGER,
         allowNull: false,
     },
@@ -22,8 +21,8 @@ const PenempatanBarang = sequelize.define('PenempatanBarang', {
         allowNull: false,
     },
 }, {
-    tableName: 'penempatan_barang',
-    timestamps: false,
+    tableName: 'penempatan_ruangan', // Nama tabel di database
+    timestamps: true, // Menggunakan createdAt dan updatedAt
 });
 
-module.exports = PenempatanBarang;
+module.exports = PenempatanRuangan;

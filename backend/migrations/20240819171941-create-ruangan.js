@@ -19,9 +19,6 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false
       },
-      foto_ruangan: {
-        type: Sequelize.STRING,
-      },
       inventaris_sapras: {
         type: Sequelize.STRING,
       },

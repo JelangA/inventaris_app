@@ -103,7 +103,6 @@ const getAll = async (Model, res) => {
         const items = await Model.findAll(); // Retrieve all items
         return response(res, items); // Return all items
     } catch (error) {
-        console.log(error);
         return responseErr(res, error.message, 500); // Return error message with HTTP status 500
     }
 };

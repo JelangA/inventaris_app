@@ -15,10 +15,6 @@ module.exports = {
         allowNull: false,
         unique: true
       },
-      id_penempatan: {
-        type: Sequelize.INTEGER,
-        allowNull: true,
-      },
       jenis_sarana: {
         type: Sequelize.STRING,
         allowNull: false

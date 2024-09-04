@@ -17,9 +17,6 @@ const Ruangan = sequelize.define('Ruangan', {
         type: DataTypes.INTEGER,
         allowNull: false,
     },
-    foto_ruangan: {
-        type: DataTypes.STRING,
-    },
     inventaris_sapras: {
         type: DataTypes.STRING,
     },

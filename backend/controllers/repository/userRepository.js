@@ -1,26 +1,24 @@
 const User = require("../../models/user");
 const { createItem, updateItem, deleteItem, getById, getAll } = require("../../utils/crudHelper");
-const respon = require("../../utils/responseHelpers");
-const handling = require("../../utils/errorHandler"); //logic CRUD
 
-const controller = {};
+const repository = {};
 
 // Create a new user
-controller.create = (req, res) => createItem(User, req.body, res);
+repository.create = (req, res) => createItem(User, req.body, res);
 
 // Update an existing user
-controller.update = (req, res) => updateItem(User, 'User', req.params.id, req.body, res);
+repository.update = (req, res) => updateItem(User, 'User', req.params.id, req.body, res);
 
 // Delete a user
-controller.delete = (req, res) => deleteItem(User, 'User', req.params.id, res);
+repository.delete = (req, res) => deleteItem(User, 'User', req.params.id, res);
 
 // Get a user by ID
-controller.getById = (req, res) => getById(User, 'User', req.params.id, res);
+repository.getById = (req, res) => getById(User, 'User', req.params.id, res);
 
 // Get all users
-controller.getAll = (req, res) => getAll(User, res);
+repository.getAll = (req, res) => getAll(User, res);
 
-controller.getProfile = async (req, res) => {
+repository.getProfile = async (req, res) => {
     try {
         const respon = require("../../utils/responseHelpers");
         const userId = req.user.userId;
@@ -45,4 +43,4 @@ controller.getProfile = async (req, res) => {
 
 
 
-module.exports = controller;
+module.exports = repository;
