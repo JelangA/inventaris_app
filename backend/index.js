@@ -16,7 +16,7 @@ app.use(cors({
   }));
 
 // Use Helmet for security headers
-app.use(helmet());
+app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }));
 
 // Body parsing middleware
 app.use(express.json());

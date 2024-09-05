@@ -31,7 +31,7 @@ export async function editDataBarang(id, data) {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }
-        });
+        }).catch((err) => console.error("Error editing data:", err));
         return res;
     } catch (error) {
         return null;
@@ -40,7 +40,7 @@ export async function editDataBarang(id, data) {
 
 export async function deleteDataBarang(id) {
     try {
-        const res = await axiosClient.delete(`/barang/${id}`);
+        const res = await axiosClient.delete(`/barang/${id}`).catch((err) => console.error("Error deleting data:", err));
         return res;
     } catch (error) {
         return null;
