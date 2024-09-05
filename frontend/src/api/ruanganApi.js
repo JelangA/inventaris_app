@@ -31,7 +31,7 @@ export async function editDataRuangan(id, data) {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }
-        });
+        }).catch((err) => console.error("Error editing data:", err));
         return res;
     } catch (error) {
         return null;

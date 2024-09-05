@@ -125,7 +125,7 @@ const DataTable = ({ data, setData, type, role }) => {
 			accessorKey: "foto_barang",
 			header: "Foto",
 			enableEditing: true,
-			Cell: ({ cell }) => <img src={cell.getValue()} alt="Foto" style={{ width: '50px', height: '50px' }} />,
+			Cell: ({ cell }) => <img src={cell.getValue()} alt="Foto" style={{ width: '200px', height: '100px', objectFit: 'cover' }} />,
 		},
 		{
 			accessorKey: "spesifikasi",
