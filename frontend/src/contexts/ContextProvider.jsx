@@ -8,7 +8,7 @@ const StateContext = createContext({
     setUser: () => {},
     setToken: () => {},
     setRuangan: () => {},
-    setJurusan: () => {}
+    setJurusan: () => {},
 });
 
 export const ContextProvider = ({ children }) => {

@@ -8,57 +8,76 @@ import { getDataBarang } from "../api/barangApi.js";
 import { getDataUser } from "../api/userApi.js";
 import { getDataLemari } from "../api/lemariApi.js";
 import { useStateContext } from "../contexts/ContextProvider.jsx";
+import { getDataPenempatanLemari } from "../api/penempatanLApi.js";
+import { getDataPenempatanRuangan } from "../api/penempatanRApi.js";
 
 function MasterPage() {
 	const { param } = useParams();
 	const type = param.toLowerCase();
-	const { jurusan, ruangan, setJurusan, setRuangan } = useStateContext();
-    const [data, setData] = useState([]);
-
-	let passedData = data;
-	let passedSetData = setData;
+	const [data, setData] = useState([]);
+	const [additionalData, setAdditionalData] = useState([]);
+	const [isLoading, setIsLoading] = useState(true);
 
 	useEffect(() => {
-        const fetchData = async () => {
-            let fetchedData = [];
-            switch (type) {
-                case "jurusan":
-					passedData = jurusan;
-					passedSetData = setJurusan;
-                    await getDataJurusan().then((res) => {
-                        fetchedData = res;
-                    })
-                    break;
-                case "ruangan":
-					passedData = ruangan;
-					passedSetData = setRuangan;
-                    await getDataRuangan().then((res) => {
-                        fetchedData = res;
-                    })
-                    break;
-                case "lemari":
-                    await getDataLemari().then((res) => {
-                        fetchedData = res;
-                    })
-                    break;
-                case "barang":
-                    await getDataBarang().then((res) => {
-                        fetchedData = res;
-                    })
-                    break;
-                case "user":
-                    await getDataUser().then((res) => {
-                        fetchedData = res;
-                    })
-                    break;
-                default:
-                    fetchedData = [];
-            }
-            setData(fetchedData);
-        }
-        fetchData();
+		if (additionalData.length !== 0) {
+			setIsLoading(false);
+		}
+	}, [additionalData]);
+
+	useEffect(() => {
+		const fetchData = async () => {
+			let fetchedData = [];
+			let fetchedAdditionalData = [];
+			switch (type) {
+				case "jurusan":
+					await getDataJurusan().then((res) => {
+						fetchedData = res;
+					});
+					break;
+				case "ruangan":
+					await getDataRuangan().then((res) => {
+						fetchedData = res;
+					});
+					break;
+				case "lemari":
+					await getDataLemari().then((res) => {
+						fetchedData = res;
+					});
+					break;
+				case "barang":
+					await getDataBarang().then((res) => {
+						fetchedData = res;
+					});
+					await getDataPenempatanLemari().then((res) => {
+						fetchedAdditionalData = [...fetchedAdditionalData, res];
+					});
+					await getDataPenempatanRuangan().then((res) => {
+						fetchedAdditionalData = [...fetchedAdditionalData, res];
+					});
+					break;
+				case "user":
+					await getDataUser().then((res) => {
+						fetchedData = res;
+					});
+					break;
+				default:
+					fetchedData = [];
+					fetchedAdditionalData = [];
+					break;
+			}
+			setData(fetchedData);
+			setAdditionalData(fetchedAdditionalData);
+			if (type !== "barang") {
+				setIsLoading(false);
+			}
+		};
+		fetchData();
 	}, [param]);
-    
+
+	if (isLoading) {
+		return <div>Loading...</div>;
+	}
+
 	return (
 		<div className="content-wrapper">
 			<section className="content-header">
@@ -87,7 +106,20 @@ function MasterPage() {
 						<div className="col-12">
 							<div className="card">
 								<div className="card-body">
-									<DataTable data={passedData} setData={passedSetData} type={type} />
+									{type === "barang" ? (
+										<DataTable
+											data={data}
+											setData={setData}
+											additionalData={additionalData}
+											type={type}
+										/>
+									) : (
+										<DataTable
+											data={data}
+											setData={setData}
+											type={type}
+										/>
+									)}
 								</div>
 							</div>
 						</div>

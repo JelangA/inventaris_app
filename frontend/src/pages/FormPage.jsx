@@ -13,10 +13,12 @@ import {
 import {
 	addDataPenempatanLemari,
 	editDataPenempatanLemari,
+	getDataPenempatanLemariById,
 } from "../api/penempatanLApi.js";
 import {
 	addDataPenempatanRuangan,
 	editDataPenempatanRuangan,
+	getDataPenempatanRuanganById,
 } from "../api/penempatanRApi.js";
 import { useStateContext } from "../contexts/ContextProvider.jsx";
 import { getDataLemari } from "../api/lemariApi";
@@ -24,17 +26,19 @@ import { getDataLemari } from "../api/lemariApi";
 export default function FormPage() {
 	const { param, id } = useParams();
 	const navigate = useNavigate();
-	const { jurusan, ruangan } = useStateContext();
+	const { jurusan, ruangan, setRuangan } = useStateContext();
 	const [formData, setFormData] = useState({});
 	const [penempatanData, setPenempatanData] = useState({
-		id_ruangan: -1,
 		id_lemari: -1,
+		id_ruangan: -1,
+		jumlah: 0,
 	});
+	const [penempatanDataPayload, setPenempatanDataPayload] = useState(null);
 	const [preview, setPreview] = useState(null);
-	const [previews, setPreviews] = useState([]); // delete
 	const [lemari, setLemari] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [penempatan, setPenempatan] = useState("");
+	const penempatanId = localStorage.getItem("penempatanId");
 
 	useEffect(() => {
 		const fetchRuanganDataById = async () => {
@@ -44,8 +48,33 @@ export default function FormPage() {
 		};
 		const fetchBarangDataById = async () => {
 			await getDataBarang().then((res) => {
-				setFormData(res.find((item) => item.id == id));
+				setFormData(() => {
+					let barangData = res.find((item) => item.id == id);
+					barangData = {
+						...barangData,
+						pengadaan: barangData.pengadaan.split("T")[0],
+					};
+					console.log(barangData);
+					return barangData;
+				});
 			});
+		};
+		const fetchPenempatanDataById = async () => {
+			if (penempatan === "ruangan") {
+				await getDataPenempatanRuanganById(penempatanId).then((res) => {
+					console.log(res);
+					if (penempatan.id_ruangan !== undefined) {
+						setPenempatan('ruangan');
+					}
+				})
+			} else {
+				await getDataPenempatanLemariById(penempatanId).then((res) => {
+					console.log(res);
+					if (penempatan.id_lemari !== undefined) {
+						setPenempatan('lemari');
+					}
+				})
+			}
 		};
 		const fetchLemariData = async () => {
 			await getDataLemari().then((res) => {
@@ -56,17 +85,18 @@ export default function FormPage() {
 			if (param === "ruangan") {
 				if (id) {
 					await fetchRuanganDataById();
+					await fetchPenempatanDataById();
 				} else {
 					setFormData({
 						nama_ruangan: "",
 						luas_ruangan: 0,
-						foto_ruangan: null,
 						inventaris_sapras: "",
 					});
 				}
 			} else {
 				if (id) {
 					await fetchBarangDataById();
+					await fetchPenempatanDataById();
 				} else {
 					setFormData({
 						no_inventaris: null,
@@ -74,7 +104,6 @@ export default function FormPage() {
 						jenis_sarana: "",
 						foto_barang: null,
 						spesifikasi: "",
-						id_penempatan: -1,
 						satuan: "",
 						jml_layak_pakai: 0,
 						jml_tidak_layak_pakai: 0,
@@ -89,14 +118,76 @@ export default function FormPage() {
 		fetchData();
 	}, [param, id]);
 
+	// Barang
+	useEffect(() => {
+		if (penempatanDataPayload) {
+			if (id && penempatanId) {
+				if (penempatan === "ruangan") {
+					editDataPenempatanRuangan(
+						penempatanId,
+						penempatanDataPayload
+					)
+						.then((res) => {
+							console.log(res);
+							navigate(`/master/${param}`);
+						})
+						.catch((err) => console.log(err));
+				} else {
+					editDataPenempatanLemari(
+						penempatanId,
+						penempatanDataPayload
+					)
+						.then((res) => {
+							console.log(res);
+							navigate(`/master/${param}`);
+						})
+						.catch((err) => console.log(err));
+				}
+			} else {
+				if (penempatan === "ruangan") {
+					addDataPenempatanRuangan(penempatanDataPayload)
+						.then((res) => {
+							console.log(res);
+							navigate(`/master/${param}`);
+						})
+						.catch((err) => {
+							console.log(err);
+						});
+				} else {
+					addDataPenempatanLemari(penempatanDataPayload)
+						.then((res) => {
+							console.log(res);
+							navigate(`/master/${param}`);
+						})
+						.catch((err) => {
+							console.log(err);
+						});
+				}
+			}
+		}
+	}, [penempatanDataPayload]);
+
 	const onSubmit = async (e) => {
 		e.preventDefault();
 		console.log(formData);
 		if (param === "ruangan") {
+			console.log(ruangan);
 			if (id) {
 				// Edit Ruangan
 				await editDataRuangan(id, formData)
 					.then(() => {
+						setRuangan((prevState) => {
+							const updatedRuangan = prevState.map((item) => {
+								if (item.id === id) {
+									return {
+										...item,
+										name: formData.name,
+									};
+								}
+								return item;
+							});
+							return updatedRuangan;
+						});
 						navigate(`/master/${param}`);
 					})
 					.catch((err) => {
@@ -105,7 +196,11 @@ export default function FormPage() {
 			} else {
 				// Create Ruangan
 				await addDataRuangan(formData)
-					.then(() => {
+					.then((res) => {
+						setRuangan((prevState) => [
+							...prevState,
+							res.data.data,
+						]);
 						navigate(`/master/${param}`);
 					})
 					.catch((err) => {
@@ -116,15 +211,35 @@ export default function FormPage() {
 			if (id) {
 				// Edit Barang
 				await editDataBarang(id, formData)
-					.then(async () => {
+					.then(() => {
 						if (penempatan === "ruangan") {
-							await editDataPenempatanRuangan(id, penempatanData)
-								.then(() => navigate(`/master/${param}`))
-								.catch((err) => console.log(err));
+							setPenempatanDataPayload(() => {
+								const newState = {
+									id_ruangan: penempatanData.id_ruangan,
+									id_barang: formData.id,
+									jumlah:
+										parseInt(formData.jml_layak_pakai) +
+										parseInt(
+											formData.jml_tidak_layak_pakai
+										),
+								};
+								console.log(newState);
+								return newState;
+							});
 						} else {
-							await editDataPenempatanLemari(id, penempatanData)
-								.then(() => navigate(`/master/${param}`))
-								.catch((err) => console.log(err));
+							setPenempatanDataPayload(() => {
+								const newState = {
+									id_lemari: penempatanData.id_lemari,
+									id_barang: formData.id,
+									jumlah:
+										parseInt(formData.jml_layak_pakai) +
+										parseInt(
+											formData.jml_tidak_layak_pakai
+										),
+								};
+								console.log(newState);
+								return newState;
+							});
 						}
 					})
 					.catch((err) => {
@@ -132,28 +247,34 @@ export default function FormPage() {
 					});
 			} else {
 				// Create Barang
-			await addDataBarang(formData)
+				await addDataBarang(formData)
 					.then(async (res) => {
 						if (penempatan === "ruangan") {
-							setPenempatanData({
-								id_ruangan: penempatanData.id_ruangan,
-								id_barang: res.data.data.id,
-								jumlah: formData.jml_layak_pakai + formData.jml_tidak_layak_pakai,
-							})
-							console.log(penempatanData);
-							await addDataPenempatanRuangan(penempatanData)
-								.then(() => navigate(`/master/${param}`))
-								.catch((err) => console.log(err));
+							setPenempatanDataPayload(() => {
+								const newState = {
+									id_ruangan: penempatanData.id_ruangan,
+									id_barang: res.data.data.id,
+									jumlah:
+										parseInt(formData.jml_layak_pakai) +
+										parseInt(
+											formData.jml_tidak_layak_pakai
+										),
+								};
+								return newState;
+							});
 						} else {
-							setPenempatanData({
-								id_lemari: penempatanData.id_lemari,
-								id_barang: res.data.data.id,
-								jumlah: formData.jml_layak_pakai + formData.jml_tidak_layak_pakai,
-							})
-							console.log(penempatanData);
-							await addDataPenempatanLemari(penempatanData)
-								.then(() => navigate(`/master/${param}`))
-								.catch((err) => console.log(err));
+							setPenempatanDataPayload(() => {
+								const newState = {
+									id_lemari: penempatanData.id_lemari,
+									id_barang: res.data.data.id,
+									jumlah:
+										parseInt(formData.jml_layak_pakai) +
+										parseInt(
+											formData.jml_tidak_layak_pakai
+										),
+								};
+								return newState;
+							});
 						}
 					})
 					.catch((err) => {
@@ -171,28 +292,14 @@ export default function FormPage() {
 	}
 
 	const imageUpload = (e, setFormData) => {
-		if (param === "ruangan") {
-			setPreviews([]);
-			const file = e.target.files;
-			console.log(file);
-			setFormData({ ...formData, foto_ruangan: file });
-			for (let i = 0; i < file.length; i++) {
-				const reader = new FileReader();
-				reader.readAsDataURL(file[i]);
-				reader.onloadend = () => {
-					setPreviews((prev) => [...prev, reader.result]);
-				};
-			}
-		} else {
-			const file = e.target.files[0];
-			console.log(file);
-			setFormData({ ...formData, foto_barang: file });
-			const reader = new FileReader();
-			reader.readAsDataURL(file);
-			reader.onloadend = () => {
-				setPreview(reader.result);
-			};
-		}
+		const file = e.target.files[0];
+		console.log(file);
+		setFormData({ ...formData, foto_barang: file });
+		const reader = new FileReader();
+		reader.readAsDataURL(file);
+		reader.onloadend = () => {
+			setPreview(reader.result);
+		};
 	};
 
 	return loading ? (
@@ -296,62 +403,6 @@ export default function FormPage() {
 												<label htmlFor="inputInventarisSapras">
 													Inventaris Sapras
 												</label>
-											</div>
-											<label
-												className="form-label"
-												htmlFor="inputFotoRuangan">
-												Foto Ruangan
-											</label>
-											<div className="mb-3">
-												<input
-													className="form-control"
-													id="inputFotoRuangan"
-													name="foto_ruangan"
-													type="file"
-													multiple
-													accept="image/*"
-													onChange={(e) =>
-														imageUpload(
-															e,
-															setFormData
-														)
-													} // TODO
-												/>
-												<div className="form-floating mt-3 mb-3">
-													<div
-														style={{
-															display: "flex",
-															maxWidth: "100%",
-															gap: "10px",
-															flexWrap: "wrap",
-														}}>
-														{previews &&
-															previews.map(
-																(
-																	preview,
-																	index
-																) => {
-																	return (
-																		<img
-																			key={
-																				index
-																			}
-																			src={
-																				preview
-																			}
-																			style={{
-																				objectFit:
-																					"cover",
-																			}}
-																			alt="preview"
-																			height="300"
-																			width="300"
-																		/>
-																	);
-																}
-															)}
-													</div>
-												</div>
 											</div>
 											<div className="mt-4 mb-0">
 												<div className="d-grid">
@@ -465,62 +516,6 @@ export default function FormPage() {
 												<label htmlFor="inputInventarisSapras">
 													Inventaris Sapras
 												</label>
-											</div>
-											<label
-												className="form-label"
-												htmlFor="inputFotoRuangan">
-												Foto Ruangan
-											</label>
-											<div className="mb-3">
-												<input
-													className="form-control"
-													id="inputFotoRuangan"
-													name="foto_ruangan"
-													type="file"
-													multiple
-													accept="image/*"
-													onChange={(e) =>
-														imageUpload(
-															e,
-															setFormData
-														)
-													} // TODO
-												/>
-												<div className="form-floating mt-3 mb-3">
-													<div
-														style={{
-															display: "flex",
-															maxWidth: "100%",
-															gap: "10px",
-															flexWrap: "wrap",
-														}}>
-														{previews &&
-															previews.map(
-																(
-																	preview,
-																	index
-																) => {
-																	return (
-																		<img
-																			key={
-																				index
-																			}
-																			src={
-																				preview
-																			}
-																			style={{
-																				objectFit:
-																					"cover",
-																			}}
-																			alt="preview"
-																			height="300"
-																			width="300"
-																		/>
-																	);
-																}
-															)}
-													</div>
-												</div>
 											</div>
 											<div className="mt-4 mb-0">
 												<div className="d-grid">
@@ -657,7 +652,7 @@ export default function FormPage() {
 												accept="image/*"
 												onChange={(e) =>
 													imageUpload(e, setFormData)
-												} // TODO
+												}
 											/>
 											<div className="form-floating mt-3 mb-3">
 												{preview && (
@@ -694,128 +689,135 @@ export default function FormPage() {
 												className="form-select"
 												name="penempatan"
 												id="inputPenempatan"
-												value={penempatan}
-												onChange={(e) =>
-													setPenempatan(
-														e.target.value
-													)
-												}>
-												<option value={""} disabled>
-													Pilih Penempatan
-												</option>
-												<option value={"ruangan"}>
-													Ruangan
-												</option>
-												<option value={"lemari"}>
-													Lemari
-												</option>
+												value={penempatan} // kesini
+												readOnly>
+												{penempatan === "ruangan" ? (
+													<option value={"ruangan"}>
+														Ruangan
+													</option>
+												) : (
+													<option value={"lemari"}>
+														Lemari
+													</option>
+												)}
 											</select>
 											<label htmlFor="inputPenempatan">
 												Penempatan Barang
 											</label>
 										</div>
-										{penempatan && (
-											<div className="form-floating mb-3">
-												{penempatan === "ruangan" ? (
-													<>
-														<select
-															className="form-select"
-															name="id_ruangan"
-															id="inputIdRuangan"
-															value={
-																penempatanData.id_ruangan
-															}
-															onChange={(e) =>
-																setPenempatanData(
-																	penempatanData.id_ruangan = 
-																	e.target
-																		.value
-																)
-															}>
-															<option
-																value={""}
-																disabled>
-																Pilih Ruangan
-															</option>
-															{ruangan.map(
-																(item) => {
-																	return (
-																		<option
-																			key={
-																				item.id
-																			}
-																			value={
-																				item.id
-																			}>
-																			{
-																				item.nama_ruangan
-																			}
-																		</option>
-																	);
+										<div className="form-floating mb-3">
+											{penempatan === "ruangan" ? (
+												<>
+													<select
+														className="form-select"
+														name="id_ruangan"
+														id="inputIdRuangan"
+														value={
+															penempatanData.id_ruangan
+														}
+														onChange={(e) => {
+															console.log(e.target.value);
+															setPenempatanData(
+																{
+																	...penempatanData,
+																	id_ruangan:
+																		e
+																			.target
+																			.value,
 																}
-															)}
-														</select>
-														<label htmlFor="inputIdRuangan">
-															Ruangan
-														</label>
-													</>
-												) : (
-													<>
-														<select
-															className="form-select"
-															name="id_lemari"
-															id="inputIdLemari"
-															value={
-																penempatanData.id_lemari
+															)
+														}
+														}>
+														<option
+															value={-1}
+															disabled>
+															Pilih Ruangan
+														</option>
+														{ruangan.map(
+															(item) => {
+																return (
+																	<option
+																		key={
+																			item.id
+																		}
+																		value={
+																			item.id
+																		}>
+																		{
+																			item.nama_ruangan
+																		}
+																	</option>
+																);
 															}
-															onChange={(e) =>
-																setPenempatanData(
-																	e.target
-																		.value
-																)
-															}>
-															<option
-																value={""}
-																disabled>
-																Pilih Lemari
-															</option>
-															{lemari.map(
-																(item) => {
-																	const namaJurusan =
-																		jurusan.find(
-																			(
-																				jur
-																			) =>
-																				jur.id ==
-																				item.id_jurusan
-																		).jurusan;
-																	return (
-																		<option
-																			key={
-																				item.id
-																			}
-																			value={
-																				item.id
-																			}>
-																			{
-																				item.no_lemari
-																			}{" "}
-																			-{" "}
-																			{
-																				namaJurusan
-																			}
-																		</option>
-																	);
+														)}
+													</select>
+													<label htmlFor="inputIdRuangan">
+														Ruangan
+													</label>
+												</>
+											) : (
+												<>
+													<select
+														className="form-select"
+														name="id_lemari"
+														id="inputIdLemari"
+														value={
+															penempatanData.id_lemari
+														}
+														onChange={(e) =>{
+															console.log(e.target.value);
+															setPenempatanData(
+																{
+																	...penempatanData,
+																	id_lemari:
+																		e
+																			.target
+																			.value,
 																}
-															)}
-														</select>
-														<label htmlFor="inputIdLemari">
-															Lemari
-														</label>
-													</>
-												)}
-											</div>
-										)}
+															)
+														}
+														}>
+														<option
+															value={-1}
+															disabled>
+															Pilih Lemari
+														</option>
+														{lemari.map(
+															(item) => {
+																const namaJurusan =
+																	jurusan.find(
+																		(
+																			jur
+																		) =>
+																			jur.id ==
+																			item.id_jurusan
+																	).jurusan;
+																return (
+																	<option
+																		key={
+																			item.id
+																		}
+																		value={
+																			item.id
+																		}>
+																		{
+																			item.no_lemari
+																		}{" "}
+																		-{" "}
+																		{
+																			namaJurusan
+																		}
+																	</option>
+																);
+															}
+														)}
+													</select>
+													<label htmlFor="inputIdLemari">
+														Lemari
+													</label>
+												</>
+											)}
+										</div>
 										<div className="form-floating mb-3">
 											<input
 												className="form-control"
@@ -1143,12 +1145,17 @@ export default function FormPage() {
 															}
 															onChange={(e) =>
 																setPenempatanData(
-																	e.target
-																		.value
+																	{
+																		...penempatanData,
+																		id_ruangan:
+																			e
+																				.target
+																				.value,
+																	}
 																)
 															}>
 															<option
-																value={""}
+																value={-1}
 																disabled>
 																Pilih Ruangan
 															</option>
@@ -1185,12 +1192,17 @@ export default function FormPage() {
 															}
 															onChange={(e) =>
 																setPenempatanData(
-																	e.target
-																		.value
+																	{
+																		...penempatanData,
+																		id_lemari:
+																			e
+																				.target
+																				.value,
+																	}
 																)
 															}>
 															<option
-																value={""}
+																value={-1}
 																disabled>
 																Pilih Lemari
 															</option>
