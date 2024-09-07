@@ -3,12 +3,13 @@ import { useStateContext } from './contexts/ContextProvider';
 import Home from './pages/Home';
 import Layout from './components/Layout';
 import GuestLayout from './components/GuestLayout';
-import Ruangan from './pages/RuanganPage';
-import Jurusan from './pages/JurusanPage';
+import RuanganPage from './pages/RuanganPage';
+import JurusanPage from './pages/JurusanPage';
 import Login from './pages/LoginPage';
 import Register from './pages/RegisterPage';
 import MasterPage from './pages/MasterPage';
 import FormPage from './pages/FormPage';
+import GaleriPage from './pages/GaleriPage';
 
 const ProtectedRoute = ({ allowedRoles, children }) => {
     const { user } = useStateContext();
@@ -28,6 +29,7 @@ const routes = createBrowserRouter([
                 element: <Home />,
             },
             {
+                // Add/Edit Ruangan/Barang
                 path: '/form/:param/:id?',
                 element: (
                     <ProtectedRoute allowedRoles={['admin', 'kep_jurusan', 'kep_bengkel']}>
@@ -36,16 +38,24 @@ const routes = createBrowserRouter([
                 )
             },
             {
-                path:'/ruangan/:namaRuanganSlug',
+                path:'/ruangan/:id',
                 element: (
                     <ProtectedRoute allowedRoles={['admin', 'staf_tu']}>
-                        <Ruangan />
+                        <RuanganPage />
                     </ProtectedRoute>
                 )
             },
             {
-                path:'/jurusan/:namaJurusanSlug',
-                element: <Jurusan />,
+                path: '/galeri/:id',
+                element: (
+                    <ProtectedRoute allowedRoles={['admin']}>
+                        <GaleriPage />
+                    </ProtectedRoute>
+                )
+            },
+            {
+                path:'/jurusan/:id',
+                element: <JurusanPage />,
             },
             {
                 path: '/master/:param',

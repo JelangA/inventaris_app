@@ -28,24 +28,6 @@ const SideNav = () => {
 		"Pengadaan",
 		"User",
 	];
-	useEffect(() => {
-		switch (user?.tipe_user) {
-			case "admin":
-				setRole("Admin");
-				break;
-			case "staf_tu":
-				setRole("Staf TU");
-				break;
-			case "kep_jurusan":
-				setRole("Kepala Jurusan");
-				break;
-			case "kep_bengkel":
-				setRole("Kepala Bengkel");
-				break;
-			default:
-				setRole("Loading...");
-		}
-	}, [user]);
 
 	useEffect(() => {
 		const fetchRuangan = async () => {
@@ -70,9 +52,25 @@ const SideNav = () => {
 					console.error("Error fetching data:", err);
 				});
 		};
+		switch (user?.tipe_user) {
+			case "admin":
+				setRole("Admin");
+				break;
+			case "staf_tu":
+				setRole("Staf TU");
+				break;
+			case "kep_jurusan":
+				setRole("Kepala Jurusan");
+				break;
+			case "kep_bengkel":
+				setRole("Kepala Bengkel");
+				break;
+			default:
+				setRole("Loading...");
+		}
 		fetchJurusan();
 		fetchRuangan();
-	}, []);
+	}, [user, token]);
 
 	const onLogout = (e) => {
 		e.preventDefault();
@@ -87,7 +85,7 @@ const SideNav = () => {
 			.join(" "); // Join the words with a space
 	}
 
-	return ruangan && jurusan ? (
+	return (
 		<div>
 			<aside className="main-sidebar sidebar-dark-primary elevation-4">
 				<Link to="/" className="brand-link text-decoration-none">
@@ -114,10 +112,7 @@ const SideNav = () => {
 					</span>
 				</Link>
 
-				{!user || !ruangan || !jurusan ? (
-					<p>Loading...</p>
-				) : (
-					<div className="sidebar">
+				<div className="sidebar">
 						<div className="user-panel mt-3 pb-3 mb-3 d-flex">
 							<div className="image">
 								<i className="fas fa-user-circle fa-2x"></i>
@@ -172,9 +167,7 @@ const SideNav = () => {
 										<ul className="nav nav-treeview">
 											{ruangan.map((item) => {
 													const slug =
-														item.nama_ruangan
-															.toLowerCase()
-															.replace(/ /g, "-");
+														item.id;
 													return (
 														<li
 															key={item.id}
@@ -219,7 +212,7 @@ const SideNav = () => {
 									<ul className="nav nav-treeview">
 										{jurusan.map((item) => {
 												const slug =
-													item.jurusan.toLowerCase();
+													item.id;
 												return (
 													<li
 														key={item.id}
@@ -303,10 +296,9 @@ const SideNav = () => {
 							</ul>
 						</nav>
 					</div>
-				)}
 			</aside>
 		</div>
-	) : <></>;
+	)
 };
 
 export default SideNav;

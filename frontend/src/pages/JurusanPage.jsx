@@ -1,21 +1,29 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import DataTable from "../components/DataTable.jsx";
-import { dataLemari } from "../api/ruanganApiTest.js";
 import { useStateContext } from '../contexts/ContextProvider.jsx';
-import { getDataJurusan } from '../api/jurusanApi.js';
+import { getDataBarang } from '../api/barangApi.js';
 
 function JurusanPage() {
-    const { namaJurusanSlug } = useParams();
+    const { id } = useParams();
     const { jurusan } = useStateContext();
-    const [jurusanDetail, setJurusanDetail] = useState(null);
+    const [barang, setBarang] = useState([]);
+    const [jurusanDetail, setJurusanDetail] = useState({});
 
     useEffect(() => {
-        console.log(jurusan);
-        if (jurusan) {
-            setJurusanDetail(jurusan.find(item => item.jurusan.toLowerCase().replace(/ /g, '-') === namaJurusanSlug));
+        const fetchDataBarang = async () => {
+            await getDataBarang().then((res) => {
+                console.log(res)
+                // const barangRuangan = res.filter((brg) => brg.)
+                setBarang(res);
+            })
         }
-    }, [namaJurusanSlug, jurusan]);
+        setJurusanDetail(() => {
+            let newJurusanDetail = jurusan.find((j) => j.id == id);
+            return newJurusanDetail;
+        });
+        fetchDataBarang();
+    }, [id, jurusan]);
 
     if (!jurusanDetail) {
         return <div>Loading...</div>;
@@ -64,7 +72,7 @@ function JurusanPage() {
                                     </div>
                                 </div>
                                 <div className="card-body">
-                                    <DataTable data={dataLemari} type={'lemari'} />
+                                    <DataTable data={barang} type={'barang'} />
                                 </div>
                             </div>
                         </div>

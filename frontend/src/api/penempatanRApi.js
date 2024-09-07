@@ -2,7 +2,7 @@ import axiosClient from "./axiosClient.js";
 
 export async function getDataPenempatanRuangan() {
     try {
-        const res = await axiosClient.get('/penempatanRuanganemari');
+        const res = await axiosClient.get('/penempatanRuangan');
         const data = res.data.data;
         const dataArray = Object.keys(data).map(key => ({ ...data[key], id: data[key].id }));
         return dataArray;
@@ -14,7 +14,7 @@ export async function getDataPenempatanRuangan() {
 
 export async function addDataPenempatanRuangan(data) {
     try {
-        const res = await axiosClient.post('/penempatanRuanganemari', data);
+        const res = await axiosClient.post('/penempatanRuangan', data);
         return res;
     } catch (error) {
         console.error("Error: ", error);
@@ -24,7 +24,7 @@ export async function addDataPenempatanRuangan(data) {
 
 export async function editDataPenempatanRuangan(id, data) {
     try {
-        const res = await axiosClient.put(`/penempatanRuanganemari/${id}`, data);
+        const res = await axiosClient.put(`/penempatanRuangan/${id}`, data);
         return res;
     } catch (error) {
         console.error("Error: ", error);
@@ -34,7 +34,7 @@ export async function editDataPenempatanRuangan(id, data) {
 
 export async function getDataPenempatanRuanganById(id) {
     try {
-        const res = await axiosClient.get(`/penempatanRuanganemari/${id}`);
+        const res = await axiosClient.get(`/penempatanRuangan/${id}`);
         return res.data.data;
     } catch (error) {
         console.error("Error: ", error);
@@ -44,7 +44,7 @@ export async function getDataPenempatanRuanganById(id) {
 
 export async function deleteDataPenempatanRuangan(id) {
     try {
-        const res = await axiosClient.delete(`/penempatanRuanganemari/${id}`);
+        const res = await axiosClient.delete(`/penempatanRuangan/${id}`);
         return res;
     } catch (error) {
         console.error("Error: ", error);

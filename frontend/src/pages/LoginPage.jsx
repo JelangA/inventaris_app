@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axiosClient from '../api/axiosClient';
 import { useStateContext } from '../contexts/ContextProvider';
@@ -10,10 +10,60 @@ export default function LoginPage() {
 		password: ''
 	});
 	const [errors, setErrors] = useState({});
-	const { token, user, setUser, setToken } = useStateContext();
+	const { token, user, ruangan, jurusan, setUser, setToken, setRuangan, setJurusan } = useStateContext();
 	const inputUsernameRef = useRef(null);
 	const inputPasswordRef = useRef(null);
 	const navigate = useNavigate();
+
+	useEffect(() => {
+		if (ruangan.length !== 0 && jurusan.length !== 0) {
+			axiosClient.get('/profile').then(res => {
+				const newUser = res.data.data;
+				if (!user) {
+					// window.location.reload();
+				}
+				setUser(newUser);
+			}).catch(err => {
+				console.log(err);
+			});
+		}
+	}, [ruangan, jurusan]);
+
+	useEffect(() => {
+		const fetchRuangan = async () => {
+			await axiosClient
+				.get("/ruangan")
+				.then((res) => {
+					setRuangan(res.data.data);
+				})
+				.catch((err) => {
+					setRuangan([]);
+					console.error("Error fetching data:", err);
+				});
+		};
+		const fetchJurusan = async () => {
+			await axiosClient
+				.get("/jurusan")
+				.then((res) => {
+					setJurusan(res.data.data);
+				})
+				.catch((err) => {
+					setJurusan([]);
+					console.error("Error fetching data:", err);
+				});
+		};
+		if (token) {
+			fetchJurusan();
+			fetchRuangan();
+		}
+	}, [token]);
+
+	useEffect(() => {
+		if (user) {
+			navigate('/');
+			window.location.reload();
+		}
+	}, [user]);
 
 	const handleInputChange = (e, ref) => {
 		const { name, value } = e.target;
@@ -59,19 +109,9 @@ export default function LoginPage() {
 				username: formData.username,
 				password: formData.password
 			}
-			axiosClient.post('/login', payload).then(async (res) => {
+			axiosClient.post('/login', payload).then((res) => {
 				const newToken = res.data.data.token;
 				setToken(newToken);
-				await axiosClient.get('/profile').then(res => {
-					const newUser = res.data.data;
-					navigate('/');
-					if (!user) {
-						window.location.reload();
-					}
-					setUser(newUser);
-				}).catch(err => {
-					console.log(err);
-				});
 			}).catch(err => {
 				console.log(err);
 			});

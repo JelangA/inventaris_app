@@ -9,7 +9,9 @@ const repository = {};
 repository.create = async (req, res) => {
     try {
         const { id_ruangan, ...otherData } = req.body; // Extract fields from request body
-        const images = req.files?.foto_ruangan; // Extract image array from request files
+        const images = req.files['foto_ruangan[]']; // Extract image array from request files
+
+        console.log("req: ", req.files);
 
         // **Validation: Check required fields**
         if (!id_ruangan) {
