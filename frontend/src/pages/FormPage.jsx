@@ -24,7 +24,7 @@ import { useStateContext } from "../contexts/ContextProvider.jsx";
 import { getDataLemari } from "../api/lemariApi";
 
 export default function FormPage() {
-	const { param, id } = useParams();
+	const { param, id, idRJ } = useParams();
 	const navigate = useNavigate();
 	const { jurusan, ruangan, setRuangan } = useStateContext();
 	const [formData, setFormData] = useState({});
@@ -64,16 +64,16 @@ export default function FormPage() {
 				await getDataPenempatanRuanganById(penempatanId).then((res) => {
 					console.log(res);
 					if (penempatan.id_ruangan !== undefined) {
-						setPenempatan('ruangan');
+						setPenempatan("ruangan");
 					}
-				})
+				});
 			} else {
 				await getDataPenempatanLemariById(penempatanId).then((res) => {
 					console.log(res);
 					if (penempatan.id_lemari !== undefined) {
-						setPenempatan('lemari');
+						setPenempatan("lemari");
 					}
-				})
+				});
 			}
 		};
 		const fetchLemariData = async () => {
@@ -115,6 +115,11 @@ export default function FormPage() {
 			await fetchLemariData();
 			setLoading(false);
 		};
+		if (param === "ruanganBarang") {
+			setPenempatan("ruangan");
+		} else if (param === "jurusanBarang") {
+			setPenempatan("lemari");
+		}
 		fetchData();
 	}, [param, id]);
 
@@ -716,40 +721,36 @@ export default function FormPage() {
 															penempatanData.id_ruangan
 														}
 														onChange={(e) => {
-															console.log(e.target.value);
-															setPenempatanData(
-																{
-																	...penempatanData,
-																	id_ruangan:
-																		e
-																			.target
-																			.value,
-																}
-															)
-														}
-														}>
+															console.log(
+																e.target.value
+															);
+															setPenempatanData({
+																...penempatanData,
+																id_ruangan:
+																	e.target
+																		.value,
+															});
+														}}>
 														<option
 															value={-1}
 															disabled>
 															Pilih Ruangan
 														</option>
-														{ruangan.map(
-															(item) => {
-																return (
-																	<option
-																		key={
-																			item.id
-																		}
-																		value={
-																			item.id
-																		}>
-																		{
-																			item.nama_ruangan
-																		}
-																	</option>
-																);
-															}
-														)}
+														{ruangan.map((item) => {
+															return (
+																<option
+																	key={
+																		item.id
+																	}
+																	value={
+																		item.id
+																	}>
+																	{
+																		item.nama_ruangan
+																	}
+																</option>
+															);
+														})}
 													</select>
 													<label htmlFor="inputIdRuangan">
 														Ruangan
@@ -764,53 +765,47 @@ export default function FormPage() {
 														value={
 															penempatanData.id_lemari
 														}
-														onChange={(e) =>{
-															console.log(e.target.value);
-															setPenempatanData(
-																{
-																	...penempatanData,
-																	id_lemari:
-																		e
-																			.target
-																			.value,
-																}
-															)
-														}
-														}>
+														onChange={(e) => {
+															console.log(
+																e.target.value
+															);
+															setPenempatanData({
+																...penempatanData,
+																id_lemari:
+																	e.target
+																		.value,
+															});
+														}}>
 														<option
 															value={-1}
 															disabled>
 															Pilih Lemari
 														</option>
-														{lemari.map(
-															(item) => {
-																const namaJurusan =
-																	jurusan.find(
-																		(
-																			jur
-																		) =>
-																			jur.id ==
-																			item.id_jurusan
-																	).jurusan;
-																return (
-																	<option
-																		key={
-																			item.id
-																		}
-																		value={
-																			item.id
-																		}>
-																		{
-																			item.no_lemari
-																		}{" "}
-																		-{" "}
-																		{
-																			namaJurusan
-																		}
-																	</option>
-																);
-															}
-														)}
+														{lemari.map((item) => {
+															const namaJurusan =
+																jurusan.find(
+																	(jur) =>
+																		jur.id ==
+																		item.id_jurusan
+																).jurusan;
+															return (
+																<option
+																	key={
+																		item.id
+																	}
+																	value={
+																		item.id
+																	}>
+																	{
+																		item.no_lemari
+																	}{" "}
+																	-{" "}
+																	{
+																		namaJurusan
+																	}
+																</option>
+															);
+														})}
 													</select>
 													<label htmlFor="inputIdLemari">
 														Lemari
@@ -968,7 +963,7 @@ export default function FormPage() {
 				<div className="container-fluid">
 					<div className="row mb-2">
 						<div className="col-sm-6">
-							<h1>Form Create {formatString(param)}</h1>
+							<h1>Form Create Barang</h1>
 						</div>
 						<div className="col-sm-6">
 							<ol className="breadcrumb float-sm-right">
@@ -976,7 +971,7 @@ export default function FormPage() {
 									<Link to="/">Home</Link>
 								</li>
 								<li className="breadcrumb-item active">
-									Create {formatString(param)}
+									Create Barang
 								</li>
 							</ol>
 						</div>
@@ -1108,141 +1103,200 @@ export default function FormPage() {
 											</label>
 										</div>
 										<div className="form-floating mb-3">
-											<select
-												className="form-select"
-												name="penempatan"
-												id="inputPenempatan"
-												value={penempatan}
-												onChange={(e) =>
-													setPenempatan(
-														e.target.value
-													)
-												}>
-												<option value={""} disabled>
-													Pilih Penempatan
-												</option>
-												<option value={"ruangan"}>
-													Ruangan
-												</option>
-												<option value={"lemari"}>
-													Lemari
-												</option>
-											</select>
-											<label htmlFor="inputPenempatan">
-												Penempatan Barang
-											</label>
+											{param !== "ruanganBarang" &&
+												param !== "jurusanBarang" && (
+														<>
+															<select
+																className="form-select"
+																name="penempatan"
+																id="inputPenempatan"
+																value={
+																	penempatan
+																}
+																onChange={(e) =>
+																	setPenempatan(
+																		e.target
+																			.value
+																	)
+																}>
+																<option
+																	value={""}
+																	disabled>
+																	Pilih
+																	Penempatan
+																</option>
+																<option
+																	value={
+																		"ruangan"
+																	}>
+																	Ruangan
+																</option>
+																<option
+																	value={
+																		"lemari"
+																	}>
+																	Lemari
+																</option>
+															</select>
+															<label htmlFor="inputPenempatan">
+																Penempatan
+																Barang
+															</label>
+														</>
+													)}
 										</div>
-										{penempatan && (
-											<div className="form-floating mb-3">
-												{penempatan === "ruangan" ? (
-													<>
-														<select
-															className="form-select"
-															name="id_ruangan"
-															id="inputIdRuangan"
-															value={
-																penempatanData.id_ruangan
-															}
-															onChange={(e) =>
-																setPenempatanData(
-																	{
-																		...penempatanData,
-																		id_ruangan:
-																			e
-																				.target
-																				.value,
-																	}
-																)
-															}>
-															<option
-																value={-1}
-																disabled>
-																Pilih Ruangan
-															</option>
-															{ruangan.map(
-																(item) => {
-																	return (
-																		<option
-																			key={
-																				item.id
-																			}
-																			value={
-																				item.id
-																			}>
-																			{
-																				item.nama_ruangan
-																			}
-																		</option>
-																	);
+										{param !== "ruanganBarang" &&
+											penempatan && (
+												<div className="form-floating mb-3">
+													{penempatan ===
+													"ruangan" ? (
+														<>
+															<select
+																className="form-select"
+																name="id_ruangan"
+																id="inputIdRuangan"
+																value={
+																	penempatanData.id_ruangan
 																}
-															)}
-														</select>
-														<label htmlFor="inputIdRuangan">
-															Ruangan
-														</label>
-													</>
-												) : (
-													<>
-														<select
-															className="form-select"
-															name="id_lemari"
-															id="inputIdLemari"
-															value={
-																penempatanData.id_lemari
-															}
-															onChange={(e) =>
-																setPenempatanData(
-																	{
-																		...penempatanData,
-																		id_lemari:
-																			e
-																				.target
-																				.value,
+																onChange={(e) =>
+																	setPenempatanData(
+																		{
+																			...penempatanData,
+																			id_ruangan:
+																				e
+																					.target
+																					.value,
+																		}
+																	)
+																}>
+																<option
+																	value={-1}
+																	disabled>
+																	Pilih
+																	Ruangan
+																</option>
+																{ruangan.map(
+																	(item) => {
+																		return (
+																			<option
+																				key={
+																					item.id
+																				}
+																				value={
+																					item.id
+																				}>
+																				{
+																					item.nama_ruangan
+																				}
+																			</option>
+																		);
 																	}
-																)
-															}>
-															<option
-																value={-1}
-																disabled>
-																Pilih Lemari
-															</option>
-															{lemari.map(
-																(item) => {
-																	const namaJurusan =
-																		jurusan.find(
+																)}
+															</select>
+															<label htmlFor="inputIdRuangan">
+																Ruangan
+															</label>
+														</>
+													) : (
+														<>
+															<select
+																className="form-select"
+																name="id_lemari"
+																id="inputIdLemari"
+																value={
+																	penempatanData.id_lemari
+																}
+																onChange={(e) =>
+																	setPenempatanData(
+																		{
+																			...penempatanData,
+																			id_lemari:
+																				e
+																					.target
+																					.value,
+																		}
+																	)
+																}>
+																<option
+																	value={-1}
+																	disabled>
+																	Pilih Lemari
+																</option>
+																{param ===
+																"jurusanBarang"
+																	? lemari.map(
 																			(
-																				jur
-																			) =>
-																				jur.id ==
-																				item.id_jurusan
-																		).jurusan;
-																	return (
-																		<option
-																			key={
-																				item.id
+																				item
+																			) => {
+																				const namaJurusan =
+																					jurusan.find(
+																						(
+																							jur
+																						) =>
+																							jur.id ==
+																							item.id_jurusan
+																					).jurusan;
+																				if (item.id_jurusan == idRJ) {
+																					return (
+																						<option
+																							key={
+																								item.id
+																							}
+																							value={
+																								item.id
+																							}>Lemari{" "}
+																							{
+																								item.no_lemari
+																							}{" "}
+																							-{" "}
+																							{
+																								namaJurusan
+																							}
+																						</option>
+																					);
+																				}
+																				return null;
 																			}
-																			value={
-																				item.id
-																			}>
-																			{
-																				item.no_lemari
-																			}{" "}
-																			-{" "}
-																			{
-																				namaJurusan
+																	  )
+																	: lemari.map(
+																			(
+																				item
+																			) => {
+																				const namaJurusan =
+																					jurusan.find(
+																						(
+																							jur
+																						) =>
+																							jur.id ==
+																							item.id_jurusan
+																					).jurusan;
+																				return (
+																					<option
+																						key={
+																							item.id
+																						}
+																						value={
+																							item.id
+																						}>
+																						{
+																							item.no_lemari
+																						}{" "}
+																						-{" "}
+																						{
+																							namaJurusan
+																						}
+																					</option>
+																				);
 																			}
-																		</option>
-																	);
-																}
-															)}
-														</select>
-														<label htmlFor="inputIdLemari">
-															Lemari
-														</label>
-													</>
-												)}
-											</div>
-										)}
+																	  )}
+															</select>
+															<label htmlFor="inputIdLemari">
+																Lemari
+															</label>
+														</>
+													)}
+												</div>
+											)}
 										<div className="form-floating mb-3">
 											<input
 												className="form-control"

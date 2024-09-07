@@ -112,12 +112,14 @@ function MasterPage() {
 											setData={setData}
 											additionalData={additionalData}
 											type={type}
+											role={'admin'}
 										/>
 									) : (
 										<DataTable
 											data={data}
 											setData={setData}
 											type={type}
+											role={'admin'}
 										/>
 									)}
 								</div>

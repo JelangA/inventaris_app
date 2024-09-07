@@ -28,6 +28,16 @@ const routes = createBrowserRouter([
                 path: '/',
                 element: <Home />,
             },
+            
+            {
+                // Add/Edit Ruangan/Barang from RuanganPage/JurusanPage
+                path: '/form/:param/:idRJ/:id?',
+                element: (
+                    <ProtectedRoute allowedRoles={['admin', 'kep_jurusan', 'kep_bengkel']}>
+                        <FormPage />
+                    </ProtectedRoute>
+                )
+            },
             {
                 // Add/Edit Ruangan/Barang
                 path: '/form/:param/:id?',

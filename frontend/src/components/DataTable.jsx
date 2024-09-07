@@ -46,29 +46,47 @@ import { useNavigate, Link } from "react-router-dom";
 import { deleteDataPenempatanLemari } from "../api/penempatanLApi.js";
 import { deleteDataPenempatanRuangan } from "../api/penempatanRApi.js";
 
-const DataTable = ({ data, setData, additionalData, type, role }) => {
+const DataTable = ({ data, setData, additionalData, idRJ, type, role }) => {
 	const [validationErrors, setValidationErrors] = useState({});
-	const { user, jurusan, ruangan, setJurusan, setRuangan } = useStateContext();
+	const { user, jurusan, ruangan, setJurusan, setRuangan } =
+		useStateContext();
 	const [penempatanBarang, setPenempatanBarang] = useState([]);
+	const [penempatanLemari, setPenempatanLemari] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const navigate = useNavigate();
 
 	// Log the additionalData when the component receives it as a prop
-    useEffect(() => {
+	useEffect(() => {
 		if (type === "barang") {
 			if (additionalData.length > 0) {
 				setPenempatanBarang(additionalData);
 			}
 		}
-    }, [additionalData]);
+	}, [additionalData]);
 
 	useEffect(() => {
-		if (type === 'barang') {
+		if (type === "barang") {
 			if (penempatanBarang.length > 0) {
 				setIsLoading(false);
 			}
 		}
 	}, [penempatanBarang]);
+
+	useEffect(() => {
+		if (type === 'lemari') {
+			if (data.length > 0) {
+				setPenempatanLemari(data);
+			}
+		}
+	}, [data]);
+
+	useEffect(() => {
+		if (type === 'lemari') {
+			if (penempatanLemari.length > 0) {
+				setIsLoading(false);			
+			}
+		}
+	}, [penempatanLemari]);
 
 	const jurusanColumns = [
 		{
@@ -265,14 +283,25 @@ const DataTable = ({ data, setData, additionalData, type, role }) => {
 						id_lemari: penempatan.id_lemari,
 						id_penempatan: penempatan.id,
 						id_barang: cell.row.original.id,
-					}
-					let existingObject = JSON.parse(localStorage.getItem("penempatanBarang"));
-					if (existingObject == null) {
-						existingObject = []
 					};
-					if (!existingObject.some(obj => JSON.stringify(obj) === JSON.stringify(localStorageObject))) {
+					let existingObject = JSON.parse(
+						localStorage.getItem("penempatanBarang")
+					);
+					if (existingObject == null) {
+						existingObject = [];
+					}
+					if (
+						!existingObject.some(
+							(obj) =>
+								JSON.stringify(obj) ===
+								JSON.stringify(localStorageObject)
+						)
+					) {
 						existingObject.push(localStorageObject);
-						localStorage.setItem("penempatanBarang", JSON.stringify(existingObject));
+						localStorage.setItem(
+							"penempatanBarang",
+							JSON.stringify(existingObject)
+						);
 					}
 					return (
 						<Link to="/master/lemari">
@@ -285,18 +314,34 @@ const DataTable = ({ data, setData, additionalData, type, role }) => {
 						id_ruangan: penempatan.id_ruangan,
 						id_penempatan: penempatan.id,
 						id_barang: cell.row.original.id,
-					}
-					let existingObject = JSON.parse(localStorage.getItem("penempatanBarang"));
-					if (existingObject == null) {
-						existingObject = []
 					};
-					if (!existingObject.some(obj => JSON.stringify(obj) === JSON.stringify(localStorageObject))) {
+					let existingObject = JSON.parse(
+						localStorage.getItem("penempatanBarang")
+					);
+					if (existingObject == null) {
+						existingObject = [];
+					}
+					if (
+						!existingObject.some(
+							(obj) =>
+								JSON.stringify(obj) ===
+								JSON.stringify(localStorageObject)
+						)
+					) {
 						existingObject.push(localStorageObject);
-						localStorage.setItem("penempatanBarang", JSON.stringify(existingObject));
+						localStorage.setItem(
+							"penempatanBarang",
+							JSON.stringify(existingObject)
+						);
 					}
 					return (
 						<Link to="/master/ruangan">
-							Ruangan {ruangan.find((r) => r.id == penempatan.id_ruangan).nama_ruangan}
+							Ruangan{" "}
+							{
+								ruangan.find(
+									(r) => r.id == penempatan.id_ruangan
+								).nama_ruangan
+							}
 						</Link>
 					);
 				}
@@ -378,28 +423,39 @@ const DataTable = ({ data, setData, additionalData, type, role }) => {
 					}),
 			},
 		},
-		{
-			accessorKey: "id_jurusan",
-			header: "ID Jurusan",
-			enableEditing: true,
-			muiEditTextFieldProps: {
-				select: true,
-				required: true,
-				error: !!validationErrors?.id_jurusan,
-				helperText: validationErrors?.id_jurusan,
-				onFocus: () =>
-					setValidationErrors({
-						...validationErrors,
-						id_jurusan: undefined,
-					}),
-				children: jurusan.map((j) => (
-					<MenuItem key={j.id} value={j.id}>
-						{j.jurusan}
-					</MenuItem>
-				)),
-			},
-		},
 	];
+
+	const lemariColumn = {
+		accessorKey: "id_jurusan",
+		id: "id_jurusan",
+		header: "Jurusan",
+		enableEditing: true,
+		muiEditTextFieldProps: {
+			select: true,
+			required: true,
+			error: !!validationErrors?.id_jurusan,
+			helperText: validationErrors?.id_jurusan,
+			onFocus: () =>
+				setValidationErrors({
+					...validationErrors,
+					id_jurusan: undefined,
+				}),
+			children: jurusan.map((j) => (
+				<MenuItem key={j.id} value={j.id}>
+					{j.jurusan}
+				</MenuItem>
+			)),
+		},
+		Cell: ({ cell }) => {
+			const penempatan = penempatanLemari.find(
+				(p) => p.id == cell.row.original.id
+			)
+			if (penempatan) {
+				return jurusan.find((j) => j.id == penempatan.id_jurusan).jurusan;
+			}
+			return null;
+		},
+	};
 
 	const userColumns = [
 		{
@@ -587,14 +643,22 @@ const DataTable = ({ data, setData, additionalData, type, role }) => {
 				tableType.editFunction = editDataJurusan;
 				tableType.deleteFunction = deleteDataJurusan;
 				break;
-			case "ruanganBarang" || "jurusanBarang":
+			case "ruanganBarang":
+				tableType.columns = barangColumns;
+				tableType.createFunction = addDataBarang;
+				tableType.editFunction = editDataBarang;
+				tableType.deleteFunction = deleteDataBarang;
+				break;
+			case "jurusanBarang":
 				tableType.columns = barangColumns;
 				tableType.createFunction = addDataBarang;
 				tableType.editFunction = editDataBarang;
 				tableType.deleteFunction = deleteDataBarang;
 				break;
 			case "barang":
-				tableType.columns = isLoading ? barangColumns : [...barangColumns, barangPenempatanColumn];
+				tableType.columns = isLoading
+					? barangColumns
+					: [...barangColumns, barangPenempatanColumn];
 				tableType.createFunction = addDataBarang;
 				tableType.editFunction = editDataBarang;
 				tableType.deleteFunction = deleteDataBarang;
@@ -606,7 +670,7 @@ const DataTable = ({ data, setData, additionalData, type, role }) => {
 				tableType.deleteFunction = deleteDataRuangan;
 				break;
 			case "lemari":
-				tableType.columns = lemariColumns;
+				tableType.columns = isLoading ? lemariColumns : [...lemariColumns, lemariColumn];
 				tableType.createFunction = addDataLemari;
 				tableType.editFunction = editDataLemari;
 				tableType.deleteFunction = deleteDataLemari;
@@ -630,129 +694,245 @@ const DataTable = ({ data, setData, additionalData, type, role }) => {
 
 	const columns = tableMemo.columns;
 
-	const table = useMaterialReactTable({
-		columns,
-		data,
-		createDisplayMode: "modal",
-		editDisplayMode: "row",
-		enableEditing: true,
-		// initialState: { columnVisibility: {id: false} },
-		getRowId: (row) => row.id,
-		onCreatingRowCancel: () => setValidationErrors({}),
-		onCreatingRowSave: async ({ values, table }) => {
-			// Tambahkan logika simpan
-			let newData;
-			await tableMemo.createFunction(values).then((res) => {
-				newData = res.data.data;
-				setData((prevData) => [...prevData, newData]);
-			});
-			table.setCreatingRow(null);
-			if (type === "jurusan") {
-				setJurusan((prevData) => [...prevData, newData]);
-			}
-		},
-		onEditingRowCancel: () => setValidationErrors({}),
-		onEditingRowSave: async ({ values, table }) => {
-			await tableMemo.editFunction(values.id, values).then(() => {
-				setData((prevData) =>
-					prevData.map((dataElement) =>
-						dataElement.id === values.id ? values : dataElement
-					)
-				);
-			});
-			if (type === "jurusan") {
-				setJurusan((prevData) =>
-					prevData.map((dataElement) =>
-						dataElement.id === values.id ? values : dataElement
-					)
-				);
-			}
-			table.setEditingRow(null);
-		},
-		renderRowActions: ({ row, table }) => (
-			<Box sx={{ display: "flex", gap: "1rem" }}>
-				<Tooltip title="Edit">
-					<IconButton
-						onClick={
-							["ruangan", "barang"].includes(type)
-								? () => navigate(`/form/${type}/${row.id}`)
-								: () => table.setEditingRow(row)
-						}>
-						<EditIcon />
-					</IconButton>
-				</Tooltip>
-				<Tooltip title="Delete">
-					<IconButton
-						color="error"
-						onClick={async () => {
-							if (type === "user" && row.id == user.id) {
-								window.alert(
-									"Tidak bisa menghapus akun yang sedang login"
-								);
-							} else {
-								if (
-									window.confirm(
-										"Apakah anda yakin ingin menghapus row ini?"
-									)
-								) {
-									await tableMemo
-										.deleteFunction(row.id)
-										.then(async () => {
-											if (type === 'barang') {
-												deleteDataPenempatanLemari(penempatanId);
-											}
-											setData((prevData) =>
-												prevData.filter(
-													(r) => r.id !== row.id
-												)
+	const table = ["admin", "kep_jurusan", "kep_bengkel"].includes(role)
+		? useMaterialReactTable({
+				columns,
+				data,
+				createDisplayMode: "modal",
+				editDisplayMode: "row",
+				enableEditing: true,
+				getRowId: (row) => row.id,
+				onCreatingRowCancel: () => setValidationErrors({}),
+				onCreatingRowSave: async ({ values, table }) => {
+					// Tambahkan logika simpan
+					let newData;
+					console.log(values);
+					await tableMemo.createFunction(values).then((res) => {
+						console.log(res);
+						newData = res.data.data;
+						setData((prevData) => [...prevData, newData]);
+					});
+					table.setCreatingRow(null);
+					if (type === "jurusan") {
+						setJurusan((prevData) => [...prevData, newData]);
+					}
+				},
+				onEditingRowCancel: () => setValidationErrors({}),
+				onEditingRowSave: async ({ values, table }) => {
+					await tableMemo.editFunction(values.id, values).then(() => {
+						setData((prevData) =>
+							prevData.map((dataElement) =>
+								dataElement.id === values.id
+									? values
+									: dataElement
+							)
+						);
+					});
+					if (type === "jurusan") {
+						setJurusan((prevData) =>
+							prevData.map((dataElement) =>
+								dataElement.id === values.id
+									? values
+									: dataElement
+							)
+						);
+					}
+					table.setEditingRow(null);
+				},
+				renderRowActions: ({ row, table }) =>
+					type !== 'pengadaan' && (
+						<Box sx={{ display: "flex", gap: "1rem" }}>
+							<Tooltip title="Edit">
+								<IconButton
+									onClick={
+										["ruangan", "barang"].includes(type)
+											? () =>
+													navigate(
+														`/form/${type}/${row.id}`
+													)
+											: () => table.setEditingRow(row)
+									}>
+									<EditIcon />
+								</IconButton>
+							</Tooltip>
+							<Tooltip title="Delete">
+								<IconButton
+									color="error"
+									onClick={async () => {
+										if (
+											type === "user" &&
+											row.id == user.id
+										) {
+											window.alert(
+												"Tidak bisa menghapus akun yang sedang login"
 											);
-										});
-									if (
-										type === "jurusan" ||
-										type === "ruangan"
-									) {
-										type === "jurusan"
-											? setJurusan((prevData) =>
-													prevData.filter(
-														(r) => r.id !== row.id
+										} else {
+											if (
+												window.confirm(
+													"Apakah anda yakin ingin menghapus row ini?"
+												)
+											) {
+												await tableMemo
+													.deleteFunction(row.id)
+													.then(async () => {
+														if (type === "barang") {
+															deleteDataPenempatanLemari(
+																penempatanId
+															);
+														}
+														setData((prevData) =>
+															prevData.filter(
+																(r) =>
+																	r.id !==
+																	row.id
+															)
+														);
+													});
+												if (
+													type === "jurusan" ||
+													type === "ruangan"
+												) {
+													type === "jurusan"
+														? setJurusan(
+																(prevData) =>
+																	prevData.filter(
+																		(r) =>
+																			r.id !==
+																			row.id
+																	)
+														  )
+														: setRuangan(
+																(prevData) =>
+																	prevData.filter(
+																		(r) =>
+																			r.id !==
+																			row.id
+																	)
+														  );
+												}
+											}
+										}
+									}}>
+									<DeleteIcon />
+								</IconButton>
+							</Tooltip>
+						</Box>
+					),
+				renderTopToolbarCustomActions: ({ table }) => (
+					<Box sx={{ display: "flex", gap: "1rem" }}>
+						{type !== "user" &&
+							["admin", "kep_jurusan", "kep_bengkel"].includes(
+								role
+							) && (
+								<Button
+									variant="contained"
+									onClick={
+										["ruangan", "barang"].includes(type)
+											? () => navigate(`/form/${type}`)
+											: [
+													"ruanganBarang",
+													"jurusanBarang",
+											  ].includes(type)
+											? () =>
+													navigate(
+														`/form/${type}/${idRJ}`
 													)
-											  )
-											: setRuangan((prevData) =>
-													prevData.filter(
-														(r) => r.id !== row.id
+											: () => table.setCreatingRow(true)
+									}>
+									Create New Row
+								</Button>
+							)}
+						<Button
+							variant="outlined"
+							onClick={() => handlePrint()}>
+							Print
+						</Button>
+						<Button
+							variant="outlined"
+							onClick={() => exportToCSV()}>
+							Export to CSV
+						</Button>
+					</Box>
+				),
+		  })
+		: useMaterialReactTable({
+				columns,
+				data,
+				createDisplayMode: "modal",
+				editDisplayMode: "row",
+				getRowId: (row) => row.id,
+				onCreatingRowCancel: () => setValidationErrors({}),
+				onCreatingRowSave: async ({ values, table }) => {
+					// Tambahkan logika simpan
+					let newData;
+					await tableMemo.createFunction(values).then((res) => {
+						newData = res.data.data;
+						setData((prevData) => [...prevData, newData]);
+					});
+					table.setCreatingRow(null);
+					if (type === "jurusan") {
+						setJurusan((prevData) => [...prevData, newData]);
+					}
+				},
+				onEditingRowCancel: () => setValidationErrors({}),
+				onEditingRowSave: async ({ values, table }) => {
+					await tableMemo.editFunction(values.id, values).then(() => {
+						setData((prevData) =>
+							prevData.map((dataElement) =>
+								dataElement.id === values.id
+									? values
+									: dataElement
+							)
+						);
+					});
+					if (type === "jurusan") {
+						setJurusan((prevData) =>
+							prevData.map((dataElement) =>
+								dataElement.id === values.id
+									? values
+									: dataElement
+							)
+						);
+					}
+					table.setEditingRow(null);
+				},
+				renderTopToolbarCustomActions: ({ table }) => (
+					<Box sx={{ display: "flex", gap: "1rem" }}>
+						{type !== "user" &&
+							["admin", "kep_jurusan", "kep_bengkel"].includes(
+								role
+							) && (
+								<Button
+									variant="contained"
+									onClick={
+										["ruangan", "barang"].includes(type)
+											? () => navigate(`/form/${type}`)
+											: [
+													"ruanganBarang",
+													"jurusanBarang",
+											  ].includes(type)
+											? () =>
+													navigate(
+														`/form/${type}/${idRJ}`
 													)
-											  );
-									}
-								}
-							}
-						}}>
-						<DeleteIcon />
-					</IconButton>
-				</Tooltip>
-			</Box>
-		),
-		renderTopToolbarCustomActions: ({ table }) => (
-			<Box sx={{ display: "flex", gap: "1rem" }}>
-				{type !== "user" && (
-					<Button
-						variant="contained"
-						onClick={
-							["ruangan", "barang"].includes(type)
-								? () => navigate(`/form/${type}`)
-								: () => table.setCreatingRow(true)
-						}>
-						Create New Row
-					</Button>
-				)}
-				<Button variant="outlined" onClick={() => handlePrint()}>
-					Print
-				</Button>
-				<Button variant="outlined" onClick={() => exportToCSV()}>
-					Export to CSV
-				</Button>
-			</Box>
-		),
-	});
+											: () => table.setCreatingRow(true)
+									}>
+									Create New Row
+								</Button>
+							)}
+						<Button
+							variant="outlined"
+							onClick={() => handlePrint()}>
+							Print
+						</Button>
+						<Button
+							variant="outlined"
+							onClick={() => exportToCSV()}>
+							Export to CSV
+						</Button>
+					</Box>
+				),
+		  });
 
 	const handlePrint = () => {
 		const printWindow = window.open("", "", "height=600,width=800");
@@ -800,8 +980,12 @@ const DataTable = ({ data, setData, additionalData, type, role }) => {
 		link.click();
 	};
 
-	if (type === 'barang') {
-		return !isLoading ? <MaterialReactTable table={table} /> : <div>Loading...</div>;
+	if (type === "barang") {
+		return !isLoading ? (
+			<MaterialReactTable table={table} />
+		) : (
+			<div>Loading...</div>
+		);
 	}
 	return <MaterialReactTable table={table} />;
 };
