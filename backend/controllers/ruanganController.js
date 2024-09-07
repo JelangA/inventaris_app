@@ -17,6 +17,16 @@ controller.getDataRuangan = async (req, res) => {
         // Ambil semua barang
         const barangs = await Barang.findAll();
 
+        // Menambahkan properti `jml_total` ke setiap objek barang
+        const updatedBarangs = barangs.map(barang => {
+            // Menghitung jml_total sebagai penjumlahan jml_layak_pakai dan jml_tidak_layak_pakai
+            const jml_total = barang.jml_layak_pakai + barang.jml_tidak_layak_pakai;
+            return {
+                ...barang.dataValues, // Menyalin semua atribut barang
+                jml_total // Menambahkan jml_total
+            };
+        });
+
         // Ambil galeri ruangan berdasarkan id_ruangan
         const galeriByRuanganId = {};
         const galeri = await GaleriRuangan.findAll();
@@ -38,7 +48,7 @@ controller.getDataRuangan = async (req, res) => {
 
         // Mengelompokkan barang berdasarkan id_barang
         const barangById = {};
-        barangs.forEach(item => {
+        updatedBarangs.forEach(item => {
             barangById[item.id] = item;
         });
 
@@ -49,7 +59,7 @@ controller.getDataRuangan = async (req, res) => {
 
             // Untuk setiap penempatan, ambil detail barang
             const barangDetails = penempatanForRuangan.map(penempatan => ({
-                ...barangById[penempatan.id_barang].toJSON(),
+                ...barangById[penempatan.id_barang], // Menggunakan barang yang sudah di-update
                 jumlah: penempatan.jumlah
             }));
 

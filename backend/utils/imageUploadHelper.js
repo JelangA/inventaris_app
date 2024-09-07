@@ -57,4 +57,26 @@ const uploadImage = (image, req) => {
     });
 };
 
+const uploadArrayImage = async (images, req, res) => {
+    const imageUrls = [];
+
+    for (const image of images) {
+        const imageError = validateImage(image);
+        if (imageError) {
+            return responseErr(res, imageError, 400);
+        }
+
+        try {
+            const imageUrl = await uploadImage(image, req);
+            imageUrls.push(imageUrl);
+        } catch (error) {
+            console.log("ERROR uploading image:", error.message);
+            return responseErr(res, "Error uploading image", 500);
+        }
+    }
+
+    return imageUrls;
+};
+
+
 module.exports = { uploadImage, validateImage };

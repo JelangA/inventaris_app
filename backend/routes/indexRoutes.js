@@ -7,7 +7,7 @@ const ruanganController = require("../controllers/ruanganController");
 router.use(require("./documentation/authRoutes"));
 router.get("/navitem", navMenuController.getNavitem);
 
-router.use(middleware.verifyToken);
+// router.use(middleware.verifyToken);
 // protected routes
 router.use("/pengadaan", require("./documentation/pengadaanRoutes"));
 

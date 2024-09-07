@@ -1,4 +1,4 @@
-const penemparanRuangan = require('../../models/galeri_ruangan');
+const penemparanRuangan = require('../../models/penempatan_ruangan');
 const {createItem, updateItem, deleteItem, getById, getAll} = require('../../utils/crudHelper');
 
 const repository = {};

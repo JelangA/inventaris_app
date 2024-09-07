@@ -9,6 +9,18 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+      id_lemari: {
+        allowNull: false,
+        type: Sequelize.INTEGER
+      },
+      id_barang: {
+        allowNull: false,
+        type: Sequelize.INTEGER
+      },
+      jumlah: {
+        allowNull: false,
+        type: Sequelize.INTEGER
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
