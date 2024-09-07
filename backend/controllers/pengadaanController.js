@@ -8,11 +8,8 @@ const controller = {};
 
 controller.pengadaanBarang = async (req, res) => {
     try {
-        // Null-kan stok_asal sebelum data pengadaan diinputkan
-        req.body.stok_asal = null;
-
         // Buat log pengadaan dan simpan ke database
-        const logPengadaan = await createItem(LogPengadaan, req.body, res);
+        const logPengadaan = await LogPengadaan.create(req.body);
 
         // Mencari barang berdasarkan ID
         const barang = await Barang.findOne({ where: { id: req.body.barangId } });

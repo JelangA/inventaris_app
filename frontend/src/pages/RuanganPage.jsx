@@ -10,7 +10,7 @@ import { deleteDataGaleri, getDataGaleri } from '../api/galeriApi.js';
 
 function RuanganPage() {
     const { id } = useParams();
-    const { user, ruangan, setRuangan } = useStateContext();
+    const { user, ruangan } = useStateContext();
     const [barang, setBarang] = useState([]);
     const [additionalData, setAdditionalData] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -64,6 +64,8 @@ function RuanganPage() {
     if (!ruanganDetail || isLoading) {
         return <div>Loading...</div>;
     }
+
+    console.log(additionalData)
 
     return (
         <div className="content-wrapper">
@@ -144,7 +146,7 @@ function RuanganPage() {
                                     </div>
                                 </div>
                                 <div className="card-body">
-                                    <DataTable data={barang} additionalData={additionalData} type={'ruanganBarang'} />
+                                    <DataTable data={barang} additionalData={additionalData} idRJ={id} type={'ruanganBarang'} role={user.tipe_user} />
                                 </div>
                             </div>
                         </div>

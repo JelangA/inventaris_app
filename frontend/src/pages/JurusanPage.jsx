@@ -3,26 +3,59 @@ import { useParams, Link } from 'react-router-dom';
 import DataTable from "../components/DataTable.jsx";
 import { useStateContext } from '../contexts/ContextProvider.jsx';
 import { getDataBarang } from '../api/barangApi.js';
+import { getDataLemari } from '../api/lemariApi.js';
+import { getDataPenempatanLemari } from "../api/penempatanLApi.js";
+import { getDataPenempatanRuangan } from "../api/penempatanRApi.js";
 
 function JurusanPage() {
     const { id } = useParams();
-    const { jurusan } = useStateContext();
+    const { user, jurusan } = useStateContext();
     const [barang, setBarang] = useState([]);
+    const [additionalData, setAdditionalData] = useState([]);
     const [jurusanDetail, setJurusanDetail] = useState({});
+    const [isLoading, setIsLoading] = useState(true);
+    const [lemari, setLemari] = useState([]);
+    const penempatanBarang = JSON.parse(localStorage.getItem('penempatanBarang'));
+
+    useEffect(() => {
+		if (additionalData.length !== 0) {
+			setIsLoading(false);
+		}
+	}, [additionalData]);
 
     useEffect(() => {
         const fetchDataBarang = async () => {
+            let fetchedAdditionalData = [];
             await getDataBarang().then((res) => {
-                console.log(res)
-                // const barangRuangan = res.filter((brg) => brg.)
-                setBarang(res);
-            })
+                console.log(res);
+                console.log(penempatanBarang);
+                console.log(lemari);
+                const barangJurusan = res.filter((brg) => penempatanBarang.find((pb) => pb.id_barang == brg.id && lemari.find((l) => l.id == pb.id_lemari && l.id_jurusan == id)));
+                setBarang(barangJurusan);
+            });
+            await getDataPenempatanLemari().then((res) => {
+                fetchedAdditionalData = [...fetchedAdditionalData, res];
+            });
+            await getDataPenempatanRuangan().then((res) => {
+                fetchedAdditionalData = [...fetchedAdditionalData, res];
+            });
+            setAdditionalData(fetchedAdditionalData);
         }
+        fetchDataBarang();
+    }, [lemari]);
+
+    useEffect(() => {
+        const fetchDataLemari = async () => {
+            await getDataLemari().then((res) => {
+                const lemariJurusan = res.filter((l) => l.id_jurusan == id);
+                setLemari(lemariJurusan);
+            });
+        }
+        fetchDataLemari();
         setJurusanDetail(() => {
             let newJurusanDetail = jurusan.find((j) => j.id == id);
             return newJurusanDetail;
         });
-        fetchDataBarang();
     }, [id, jurusan]);
 
     if (!jurusanDetail) {
@@ -35,7 +68,7 @@ function JurusanPage() {
                 <div className="container-fluid">
                     <div className="row mb-2">
                         <div className="col-sm-6">
-                            <h1>Data Lemari Jurusan {jurusanDetail.jurusan}</h1>
+                            <h1>Data Barang Jurusan {jurusanDetail.jurusan}</h1>
                         </div>
                         <div className="col-sm-6">
                             <ol className="breadcrumb float-sm-right">
@@ -72,7 +105,7 @@ function JurusanPage() {
                                     </div>
                                 </div>
                                 <div className="card-body">
-                                    <DataTable data={barang} type={'barang'} />
+                                    <DataTable data={barang} idRJ={id} type={'jurusanBarang'} role={user.tipe_user} />
                                 </div>
                             </div>
                         </div>
