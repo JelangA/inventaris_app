@@ -16,17 +16,12 @@ export default function LoginPage() {
 	const navigate = useNavigate();
 
 	useEffect(() => {
-		if (ruangan.length !== 0 && jurusan.length !== 0) {
-			axiosClient.get('/profile').then(res => {
-				const newUser = res.data.data;
-				if (!user) {
-					// window.location.reload();
-				}
-				setUser(newUser);
-			}).catch(err => {
-				console.log(err);
-			});
-		}
+		axiosClient.get('/profile').then(res => {
+			const newUser = res.data.data;
+			setUser(newUser);
+		}).catch(err => {
+			console.log(err);
+		});
 	}, [ruangan, jurusan]);
 
 	useEffect(() => {
@@ -34,6 +29,7 @@ export default function LoginPage() {
 			await axiosClient
 				.get("/ruangan")
 				.then((res) => {
+					console.log("fetchRuangan: ", res.data.data)
 					setRuangan(res.data.data);
 				})
 				.catch((err) => {
@@ -45,6 +41,7 @@ export default function LoginPage() {
 			await axiosClient
 				.get("/jurusan")
 				.then((res) => {
+					console.log("fetchJurusan: ", res.data.data)
 					setJurusan(res.data.data);
 				})
 				.catch((err) => {
