@@ -29,7 +29,7 @@ export default function LoginPage() {
 			await axiosClient
 				.get("/ruangan")
 				.then((res) => {
-					console.log("fetchRuangan: ", res.data.data)
+					
 					setRuangan(res.data.data);
 				})
 				.catch((err) => {
@@ -41,7 +41,6 @@ export default function LoginPage() {
 			await axiosClient
 				.get("/jurusan")
 				.then((res) => {
-					console.log("fetchJurusan: ", res.data.data)
 					setJurusan(res.data.data);
 				})
 				.catch((err) => {

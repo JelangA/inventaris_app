@@ -5,11 +5,13 @@ import Layout from './components/Layout';
 import GuestLayout from './components/GuestLayout';
 import RuanganPage from './pages/RuanganPage';
 import JurusanPage from './pages/JurusanPage';
+import PengadaanPage from './pages/PengadaanPage';
 import Login from './pages/LoginPage';
 import Register from './pages/RegisterPage';
 import MasterPage from './pages/MasterPage';
 import FormPage from './pages/FormPage';
 import GaleriPage from './pages/GaleriPage';
+import AddPengadaanPage from './pages/AddPengadaanPage';
 
 const ProtectedRoute = ({ allowedRoles, children }) => {
     const { user } = useStateContext();
@@ -28,10 +30,9 @@ const routes = createBrowserRouter([
                 path: '/',
                 element: <Home />,
             },
-            
             {
-                // Add/Edit Ruangan/Barang from RuanganPage/JurusanPage
-                path: '/form/:param/:idRJ/:id?',
+                // Edit Barang from JurusanPage
+                path: '/form/edit/:param/:idJurusan/:idLemari/:idRB', // :param sudah pasti 'jurusanBarang'
                 element: (
                     <ProtectedRoute allowedRoles={['admin', 'kep_jurusan', 'kep_bengkel']}>
                         <FormPage />
@@ -39,8 +40,35 @@ const routes = createBrowserRouter([
                 )
             },
             {
-                // Add/Edit Ruangan/Barang
-                path: '/form/:param/:id?',
+                // Add Barang from JurusanPage
+                path: '/form/add/:param/:idJurusan/:idLemari', // :param sudah pasti 'jurusanBarang'
+                element: (
+                    <ProtectedRoute allowedRoles={['admin', 'kep_jurusan', 'kep_bengkel']}>
+                        <FormPage />
+                    </ProtectedRoute>
+                )
+            },
+            {
+                // Edit Barang from RuanganPage
+                path: '/form/edit/:param/:idRuangan/:idRB', // :param sudah pasti 'ruanganBarang'
+                element: (
+                    <ProtectedRoute allowedRoles={['admin', 'kep_jurusan', 'kep_bengkel']}>
+                        <FormPage />
+                    </ProtectedRoute>
+                )
+            },
+            {
+                // Add Barang from RuanganPage
+                path: '/form/add/:param/:idRuangan', // :param sudah pasti 'ruanganBarang'
+                element: (
+                    <ProtectedRoute allowedRoles={['admin', 'kep_jurusan', 'kep_bengkel']}>
+                        <FormPage />
+                    </ProtectedRoute>
+                )
+            },
+            {
+                // Add Barang from MasterPage
+                path: '/form/:param/:idRB?', // :param sudah pasti 'barang'
                 element: (
                     <ProtectedRoute allowedRoles={['admin', 'kep_jurusan', 'kep_bengkel']}>
                         <FormPage />
@@ -64,8 +92,16 @@ const routes = createBrowserRouter([
                 )
             },
             {
-                path:'/jurusan/:id',
+                path:'/jurusan/:idJurusan/:idLemari',
                 element: <JurusanPage />,
+            },
+            {
+                path: '/pengadaan/add',
+                element: <AddPengadaanPage />
+            },
+            {
+                path: '/pengadaan',
+                element: <PengadaanPage />
             },
             {
                 path: '/master/:param',

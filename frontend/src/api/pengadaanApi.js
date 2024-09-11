@@ -8,3 +8,12 @@ export async function addDataPengadaan(data) {
         return null;
     }
 }
+
+export async function getDataPengadaan() {
+    try {
+        const res = await axiosClient.get('/pengadaan').catch((err) => console.error("Error fetching data:", err));
+        return res.data.data;
+    } catch (error) {
+        return [];
+    }
+}
