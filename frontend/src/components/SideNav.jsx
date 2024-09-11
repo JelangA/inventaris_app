@@ -13,10 +13,12 @@ const SideNav = () => {
 		user,
 		ruangan,
 		jurusan,
+		lemari,
 		setUser,
 		setToken,
 		setRuangan,
 		setJurusan,
+		setLemari,
 	} = useStateContext();
 	const [role, setRole] = useState("");
 	// Fetch these datas from the API
@@ -25,7 +27,6 @@ const SideNav = () => {
 		"Ruangan",
 		"Lemari",
 		"Barang",
-		"Pengadaan",
 		"User",
 	];
 
@@ -52,6 +53,17 @@ const SideNav = () => {
 					console.error("Error fetching data:", err);
 				});
 		};
+		const fetchLemari = async () => {
+			await axiosClient
+				.get("/lemari")
+				.then((res) => {
+					setLemari(res.data.data);
+				})
+				.catch((err) => {
+					setLemari([]);
+					console.error("Error fetching data:", err);
+				});
+		}
 		switch (user?.tipe_user) {
 			case "admin":
 				setRole("Admin");
@@ -70,6 +82,7 @@ const SideNav = () => {
 		}
 		fetchJurusan();
 		fetchRuangan();
+		fetchLemari();
 	}, [user, token]);
 
 	const onLogout = (e) => {
@@ -153,7 +166,7 @@ const SideNav = () => {
 											href="#"
 											className={`nav-link ${
 												location.pathname.includes(
-													"/ruangan/ruang"
+													"/ruangan/"
 												)
 													? "active"
 													: ""
@@ -211,17 +224,17 @@ const SideNav = () => {
 									</a>
 									<ul className="nav nav-treeview">
 										{jurusan.map((item) => {
-												const slug =
+												const idJurusan =
 													item.id;
 												return (
 													<li
 														key={item.id}
 														className="nav-item">
-														<Link
-															to={`/jurusan/${slug}`}
+														<a
+															href="#"
 															className={`nav-link ${
 																location.pathname.includes(
-																	`/jurusan/${slug}`
+																	`/jurusan/${idJurusan}`
 																)
 																	? "active"
 																	: ""
@@ -229,13 +242,55 @@ const SideNav = () => {
 															<i className="nav-icon far fa-circle" />
 															<p>
 																{item.jurusan}
+																<i className="fas fa-angle-left right" />
 															</p>
-														</Link>
+														</a>
+														<ul className="nav-treeview">
+															{lemari.map((l) => {
+																if (l.id_jurusan == item.id) {
+																	const idLemari = l.id;
+																	return (
+																		<li
+																			key={l.id}
+																			className="nav-item pl-4">
+																			<Link
+																				to={`/jurusan/${idJurusan}/${idLemari}`}
+																				className={`nav-link ${
+																					location.pathname.includes(
+																						`/jurusan/${idJurusan}/${idLemari}`
+																					)
+																						? "active"
+																						: ""
+																				}`}>
+																				<p>
+																					Lemari{" "}
+																					{
+																						l.no_lemari
+																					}
+																				</p>
+																			</Link>
+																		</li>
+																	)
+																}
+															})}
+														</ul>
 													</li>
 												);
 											})
 										}
 									</ul>
+								</li>
+								<li className="nav-item">
+									<Link
+										to="/pengadaan"
+										className={`nav-link ${
+											location.pathname.includes("/pengadaan")
+												? "active"
+												: ""
+										}`}>
+										<i className="nav-icon fas fa-clipboard-list" />
+										<p>Pengadaan</p>
+									</Link>
 								</li>
 								{user.tipe_user === "admin" && (
 									<li className="nav-header">MASTER</li>

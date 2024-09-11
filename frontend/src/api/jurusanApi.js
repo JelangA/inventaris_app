@@ -14,7 +14,6 @@ export async function getDataJurusan() {
 
 export async function addDataJurusan(data) {
     try {
-        console.log("masuk create");
         const res = await axiosClient.post('/jurusan', data);
         return res;
     } catch (error) {
@@ -24,7 +23,6 @@ export async function addDataJurusan(data) {
 
 export async function editDataJurusan(id, data) {
     try {
-        console.log(id);
         const res = await axiosClient.put(`/jurusan/${id}`, data).catch((err) => console.error("Error editing data:", err));
         return res;
     } catch (error) {
