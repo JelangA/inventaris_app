@@ -93,17 +93,13 @@ const DataTable = ({
 
 	useEffect(() => {
 		if (type === "lemari") {
-			if (data.length > 0) {
 				setPenempatanLemari(data);
-			}
 		}
 	}, [data]);
 
 	useEffect(() => {
 		if (type === "lemari") {
-			if (penempatanLemari.length > 0) {
 				setIsLoading(false);
-			}
 		}
 	}, [penempatanLemari]);
 
