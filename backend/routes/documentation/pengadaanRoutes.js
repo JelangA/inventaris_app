@@ -51,4 +51,6 @@ const pengadaanController = require('../../controllers/pengadaanController');
 
 router.post("/", pengadaanController.pengadaanBarang);
 
+router.get("/", pengadaanController.getALlPengadaan);
+
 module.exports = router;
