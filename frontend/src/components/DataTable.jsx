@@ -871,7 +871,7 @@ const DataTable = ({
 								<Button
 									variant="contained"
 									onClick={
-										["ruangan", "barang"].includes(type)
+										["barang"].includes(type)
 											? () => navigate(`/form/${type}`)
 											: ["ruanganBarang"].includes(type)
 											? () =>
@@ -951,7 +951,7 @@ const DataTable = ({
 								<Button
 									variant="contained"
 									onClick={
-										["ruangan", "barang"].includes(type)
+										["barang"].includes(type)
 											? () => navigate(`/form/${type}`)
 											: ["ruanganBarang"].includes(type)
 											? () =>
