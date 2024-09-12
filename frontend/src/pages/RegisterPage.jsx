@@ -102,7 +102,9 @@ export default function RegisterPage() {
 				console.log(res);
 				navigate('/login');
 			}).catch(err => {
-				console.log(err);
+				setErrors({
+					login: err.response?.data?.message || 'Login gagal, periksa kredensial Anda.'
+				});
 			})
 		}
 	}
@@ -118,6 +120,9 @@ export default function RegisterPage() {
 							</h3>
 						</div>
 						<div className="card-body">
+							{errors.login && <div className="alert alert-danger" role="alert">
+								{errors.login}
+							</div>}
 							<form onSubmit={onSubmit}>
 								<div className="form-floating mb-3">
 									<input

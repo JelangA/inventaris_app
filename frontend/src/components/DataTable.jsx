@@ -90,12 +90,6 @@ const DataTable = ({ data, setData, additionalData, idRJ, type, role }) => {
 
 	const jurusanColumns = [
 		{
-			accessorKey: "id",
-			header: "ID",
-			enableEditing: false,
-			size: 80,
-		},
-		{
 			accessorKey: "jurusan",
 			header: "Jurusan",
 			muiEditTextFieldProps: {
@@ -112,12 +106,6 @@ const DataTable = ({ data, setData, additionalData, idRJ, type, role }) => {
 	];
 
 	const barangColumns = [
-		{
-			accessorKey: "id",
-			header: "ID",
-			enableEditing: false,
-			size: 80,
-		},
 		{
 			accessorKey: "no_inventaris",
 			header: "No Inventaris",
@@ -352,12 +340,6 @@ const DataTable = ({ data, setData, additionalData, idRJ, type, role }) => {
 
 	const ruanganColumns = [
 		{
-			accessorKey: "id",
-			header: "ID",
-			enableEditing: false,
-			size: 80,
-		},
-		{
 			accessorKey: "nama_ruangan",
 			header: "Nama Ruangan",
 			muiEditTextFieldProps: {
@@ -402,12 +384,6 @@ const DataTable = ({ data, setData, additionalData, idRJ, type, role }) => {
 	];
 
 	const lemariColumns = [
-		{
-			accessorKey: "id",
-			header: "ID",
-			enableEditing: false,
-			size: 80,
-		},
 		{
 			accessorKey: "no_lemari",
 			header: "No Lemari",
@@ -458,13 +434,6 @@ const DataTable = ({ data, setData, additionalData, idRJ, type, role }) => {
 	};
 
 	const userColumns = [
-		{
-			accessorKey: "id",
-			header: "ID",
-			enableEditing: false,
-			size: 80,
-			muiEditTextFieldProps: {},
-		},
 		{
 			accessorKey: "name",
 			header: "Nama",
@@ -545,12 +514,6 @@ const DataTable = ({ data, setData, additionalData, idRJ, type, role }) => {
 	];
 
 	const pengadaanColumns = [
-		{
-			accessorKey: "id",
-			header: "ID",
-			enableEditing: false,
-			size: 80,
-		},
 		{
 			accessorKey: "no_inventaris",
 			header: "No Inventaris",

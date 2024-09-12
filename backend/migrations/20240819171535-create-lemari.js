@@ -11,7 +11,7 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       no_lemari: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING,
         allowNull: false
       },
       id_jurusan: {

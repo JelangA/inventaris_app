@@ -49,6 +49,14 @@ const handleSequelizeError = (error, res) => {
         return responseErr(res, 'Database connection acquisition timed out', 408);
     }
 
+    if (error.name === 'SequelizeConnectionAccuireLimitExceededError') {
+        return responseErr(res, 'Database connection acquisition limit exceeded', 503);
+    }
+
+    if (error.name === 'SequelizeConnectionTimedOutError') {
+        return responseErr(res, 'Database connection timed out', 408);
+    }
+
     return responseErr(res, 'An unexpected error occurred', 500);
 };
 

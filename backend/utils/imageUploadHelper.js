@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const sharp = require("sharp");
 
 /**
  * Validates the image file.
@@ -47,13 +48,15 @@ const uploadImage = (image, req) => {
             fs.mkdirSync(path.dirname(imagePath), { recursive: true });
         }
 
-        // Move the image to the server
-        image.mv(imagePath, (err) => {
-            if (err) {
-                return reject(err.message);
-            }
-            resolve(url);
-        });
+        sharp(image.data)
+            .resize(800, 600) // Ubah ukuran sesuai kebutuhan
+            .jpeg({ quality: 100 }) // Simpan sebagai JPG dengan kualitas 80%
+            .toFile(imagePath, (err, info) => {
+                if (err) {
+                    return reject(err.message);
+                }
+                resolve(url);
+            });
     });
 };
 

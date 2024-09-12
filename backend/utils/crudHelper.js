@@ -7,7 +7,7 @@ const {handleSequelizeError} = require("./errorHandler");
  * @param {Object} data - Data to be inserted into the database.
  * @param {Object} res - Express response object.
  */
-const createItem = async (Model, data, res, b) => {
+const createItem = async (Model, data, res) => {
     try {
         const { id, ...filteredData } = data
         const item = await Model.create(filteredData);

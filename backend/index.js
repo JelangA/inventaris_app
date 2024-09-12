@@ -6,11 +6,17 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./config/swagger');
 require("dotenv").config();
 const fileUpload = require('express-fileupload');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 menit
+    max: 100, // Batas maksimal 100 permintaan per windowMs
+    message: "Terlalu banyak permintaan dari IP ini, coba lagi nanti.",
+});
 
 app.use(cors({
-    origin: 'http://localhost:5173', // Hanya mengizinkan permintaan dari localhost:5173
+    origin: `${process.env.HOSTVIEW}`, // Hanya mengizinkan permintaan dari localhost:5173
     methods: ['GET', 'POST', 'DELETE', 'PUT'], // Metode HTTP yang diizinkan
     allowedHeaders: ['Content-Type', 'Authorization'], // Header yang diizinkan
   }));
@@ -20,8 +26,9 @@ app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }));
 
 // Body parsing middleware
 app.use(express.json());
-app.use(fileUpload());
+app.use(fileUpload( { createParentPath: true } ));
 app.use(express.urlencoded({ extended: true }));
+app.use(limiter);
 
 // Swagger route for API documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));

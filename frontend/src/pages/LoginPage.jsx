@@ -99,21 +99,26 @@ export default function LoginPage() {
 		return formIsValid;
 	}
 
-	const onSubmit = (e) => {
+	const onSubmit = async (e) => {
 		e.preventDefault();
 		if (validateForm()) {
 			const payload = {
 				username: formData.username,
 				password: formData.password
-			}
-			axiosClient.post('/login', payload).then((res) => {
+			};
+			try {
+				const res = await axiosClient.post('/login', payload);
 				const newToken = res.data.data.token;
 				setToken(newToken);
-			}).catch(err => {
-				console.log(err);
-			});
+				setErrors({}); // Clear any previous errors
+			} catch (err) {
+				console.error('Login error:', err);
+				setErrors({
+					login: err.response?.data?.message || 'Login gagal, periksa kredensial Anda.'
+				});
+			}
 		}
-	}
+	};
 
 	return (
 		<div className="container">
@@ -126,6 +131,9 @@ export default function LoginPage() {
 							</h3>
 						</div>
 						<div className="card-body">
+							{errors.login && <div className="alert alert-danger" role="alert">
+								{errors.login}
+							</div>}
 							<form onSubmit={onSubmit}>
 								<div className="form-floating mb-3">
 									<input
