@@ -1,13 +1,23 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import DataTable from "../components/DataTable.jsx";
 import { useStateContext } from '../contexts/ContextProvider.jsx';
+import { getDataPengadaan } from '../api/pengadaanApi.js';
 
 export default function PengadaanPage() {
     const { user } = useStateContext();
     const [alert, setAlert] = useState({ status: false, message: '', type: 'success' });
     const [pengadaan, setPengadaan] = useState([]);
     const [barang, setBarang] = useState([]);
+
+    useEffect(() => {
+        const fetchDataPengadaan = async () => {
+            await getDataPengadaan().then((res) => {
+                setPengadaan(res);
+            });
+        };
+        fetchDataPengadaan();
+    }, [])
 
     return (
         <div className="content-wrapper">
