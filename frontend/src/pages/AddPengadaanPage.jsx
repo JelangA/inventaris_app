@@ -6,9 +6,10 @@ import { getDataBarang } from "../api/barangApi";
 export default function AddPengadaanPage() {
 	const [formData, setFormData] = useState({
 		no_inventaris: -1,
+		tipe_pengadaan: "default",
 	});
 	const [barang, setBarang] = useState([]);
-    const [pengadaan, setPengadaan] = useState([]);
+	const [pengadaan, setPengadaan] = useState([]);
 	const navigate = useNavigate();
 
 	useEffect(() => {
@@ -17,13 +18,13 @@ export default function AddPengadaanPage() {
 				setBarang(res);
 			});
 		};
-        const fetchDataPengadaan = async () => {
-            await getDataPengadaan().then((res) => {
-                setPengadaan(res);
-            });
-        }
+		const fetchDataPengadaan = async () => {
+			await getDataPengadaan().then((res) => {
+				setPengadaan(res);
+			});
+		};
 		fetchDataBarang();
-        // fetchDataPengadaan();
+		// fetchDataPengadaan();
 	}, []);
 
 	const onSubmit = (e) => {
@@ -32,24 +33,27 @@ export default function AddPengadaanPage() {
 			(b) => b.no_inventaris == formData.no_inventaris
 		);
 		const payload = {
-            barangId: barangDetail.id,
+			barangId: barangDetail.id,
 			no_inventaris: formData.no_inventaris,
 			tipe_pengadaan: formData.tipe_pengadaan,
 			jumlah: parseInt(formData.jumlah),
 			stok_asal:
-				barangDetail.jml_layak_pakai +
-				barangDetail.jml_tidak_layak_pakai,
+				formData.tipe_pengadaan === "barang_masuk"
+					? barangDetail.jml_layak_pakai +
+					  barangDetail.jml_tidak_layak_pakai
+					: barangDetail.jml_layak_pakai -
+					  barangDetail.jml_tidak_layak_pakai,
 			tanggal: new Date().toISOString().slice(0, 19).replace("T", " "),
 		};
-        console.log(payload);
+		console.log(payload);
 		addDataPengadaan(payload)
 			.then(() => {
 				navigate("/pengadaan");
-                // window.location.reload();
+				window.location.reload();
 			})
 			.catch((err) => {
 				console.error(err);
-			}); 
+			});
 	};
 
 	return (
@@ -116,10 +120,9 @@ export default function AddPengadaanPage() {
 											</div>
 										</div>
 										<div className="form-floating mb-3">
-											<input
-												className="form-control"
+											<select
+												className="form-select"
 												id="inputTipePengadaan"
-												type="text"
 												placeholder="Tipe Pengadaan"
 												value={formData.tipe_pengadaan}
 												onChange={(e) =>
@@ -128,8 +131,19 @@ export default function AddPengadaanPage() {
 														tipe_pengadaan:
 															e.target.value,
 													})
-												}
-											/>
+												}>
+												<option
+													value="default"
+													disabled>
+													Pilih Tipe Pengadaan
+												</option>
+												<option value="barang_masuk">
+													Barang Masuk
+												</option>
+												<option value="barang_keluar">
+													Barang Keluar
+												</option>
+											</select>
 											<label htmlFor="inputTipePengadaan">
 												Tipe Pengadaan
 											</label>
