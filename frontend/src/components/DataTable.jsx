@@ -667,13 +667,13 @@ const DataTable = ({
 					}
 				},
 				onEditingRowCancel: () => setValidationErrors({}),
-				onEditingRowSave: async ({ values, table }) => {
+				onEditingRowSave: async ({ values, table, row }) => {
 					await tableMemo
-						.editFunction(values.id, values)
+						.editFunction(row.id, values)
 						.then(() => {
 							setData((prevData) =>
 								prevData.map((dataElement) =>
-									dataElement.id === values.id
+									dataElement.id === row.id
 										? values
 										: dataElement
 								)
