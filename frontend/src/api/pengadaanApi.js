@@ -11,7 +11,7 @@ export async function addDataPengadaan(data) {
 
 export async function getDataPengadaan() {
     try {
-        const res = await axiosClient.get('/pengadaan').catch((err) => console.error("Error fetching data:", err));
+        const res = await axiosClient.get('/pengadaan').catch((err) => console.log("Error fetching data:", err));
         return res.data.data;
     } catch (error) {
         return [];
