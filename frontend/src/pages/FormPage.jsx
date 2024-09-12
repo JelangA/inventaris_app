@@ -108,7 +108,7 @@ export default function FormPage() {
 		};
 		const fetchData = async () => {
 			if (param === "ruanganBarang") {
-				if (idRB && location.pathname.includes('/edit/')) {
+				if (idRB && (location.pathname.includes('/edit/') || param === 'barang')) {
 					// Edit Barang from RuanganPage
 					await fetchBarangDataById();
 					await fetchPenempatanRuangan();
@@ -129,7 +129,7 @@ export default function FormPage() {
 				}
 			} else if (param === "jurusanBarang") {
 				// jurusanPage
-				if (idRB && location.pathname.includes('/edit/')) {
+				if (idRB && (location.pathname.includes('/edit/') || param === 'barang')) {
 					// Edit Barang from JurusanPage
 					await fetchBarangDataById();
 					await fetchPenempatanLemari();
@@ -150,7 +150,7 @@ export default function FormPage() {
 				}
 			} else {
 				// MasterPage
-				if (idRB && location.pathname.includes('/edit/')) {
+				if (idRB && (location.pathname.includes('/edit/') || param === 'barang')) {
 					await fetchBarangDataById();
 					if (penempatan === "ruangan") {
 						await fetchPenempatanRuangan();
@@ -186,7 +186,7 @@ export default function FormPage() {
 	// Barang
 	useEffect(() => {
 		if (penempatanDataPayload) {
-			if (idRB && location.pathname.includes('/edit/') && penempatanId) {
+			if (idRB && (location.pathname.includes('/edit/') || param === 'barang') && penempatanId) {
 				if (penempatan === "ruangan") {
 					editDataPenempatanRuangan(
 						penempatanId,
@@ -269,7 +269,7 @@ export default function FormPage() {
 		console.log(formData);
 		if (param === "ruangan") {
 			console.log(ruangan);
-			if (idRB && location.pathname.includes('/edit/')) {
+			if (idRB && (location.pathname.includes('/edit/') || param === 'barang')) {
 				// Edit Ruangan
 				await editDataRuangan(id, formData)
 					.then(() => {
@@ -323,7 +323,7 @@ export default function FormPage() {
 					});
 			}
 		} else {
-			if (idRB && location.pathname.includes('/edit/')) {
+			if (idRB && (location.pathname.includes('/edit/') || param === 'barang')) {
 				// Edit Barang
 				await editDataBarang(idRB, formData)
 					.then(() => {
@@ -422,7 +422,7 @@ export default function FormPage() {
 
 	return loading ? (
 		<h1>Loading...</h1>
-	) : idRB && location.pathname.includes('/edit') ? ( // If id exists, Edit Barang
+	) : idRB && (location.pathname.includes('/edit/') || param === 'barang') ? ( // If id exists, Edit Barang
 		<div className="content-wrapper">
 			<section className="content-header">
 				<div className="container-fluid">
