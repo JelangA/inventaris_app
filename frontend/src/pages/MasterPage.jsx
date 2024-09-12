@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import DataTable from "../components/DataTable.jsx";
-import { dataLemari } from "../api/ruanganApiTest.js";
 import { getDataJurusan } from "../api/jurusanApi.js";
 import { getDataRuangan } from "../api/ruanganApi.js";
 import { getDataBarang } from "../api/barangApi.js";
 import { getDataUser } from "../api/userApi.js";
 import { getDataLemari } from "../api/lemariApi.js";
-import { useStateContext } from "../contexts/ContextProvider.jsx";
 import { getDataPenempatanLemari } from "../api/penempatanLApi.js";
 import { getDataPenempatanRuangan } from "../api/penempatanRApi.js";
 
@@ -17,6 +15,11 @@ function MasterPage() {
 	const [data, setData] = useState([]);
 	const [additionalData, setAdditionalData] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
+	const [alert, setAlert] = useState({
+        status: false,
+        type: '',
+        message: ''
+    });
 
 	useEffect(() => {
 		if (additionalData.length !== 0) {
@@ -71,6 +74,11 @@ function MasterPage() {
 				setIsLoading(false);
 			}
 		};
+		setAlert({
+			status: false,
+			type: '',
+			message: ''
+		});
 		fetchData();
 	}, [param]);
 
@@ -81,6 +89,13 @@ function MasterPage() {
 	return (
 		<div className="content-wrapper">
 			<section className="content-header">
+			{
+                    alert.status &&
+                    <div className={`alert alert-${alert.type} alert-dismissible fade show`} role="alert">
+                        {alert.message}
+                        <button onClick={() => setAlert({...alert, status: false})} type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
 				<div className="container-fluid">
 					<div className="row mb-2">
 						<div className="col-sm-6">
@@ -113,6 +128,8 @@ function MasterPage() {
 											additionalData={additionalData}
 											type={type}
 											role={'admin'}
+											alert={alert}
+											setAlert={setAlert}
 										/>
 									) : (
 										<DataTable
@@ -120,6 +137,8 @@ function MasterPage() {
 											setData={setData}
 											type={type}
 											role={'admin'}
+											alert={alert}
+											setAlert={setAlert}
 										/>
 									)}
 								</div>

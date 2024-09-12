@@ -5,10 +5,14 @@ const StateContext = createContext({
     token: null,
     ruangan: [],
     jurusan: [],
+    lemari: [],
+    penempatanBarang: [],
     setUser: () => {},
     setToken: () => {},
     setRuangan: () => {},
     setJurusan: () => {},
+    setLemari: () => {},
+    setPenempatanBarang: () => {}
 });
 
 export const ContextProvider = ({ children }) => {
@@ -16,6 +20,8 @@ export const ContextProvider = ({ children }) => {
     const [token, _setToken] = useState(sessionStorage.getItem('token'));
     const [ruangan, setRuangan] = useState([]);
     const [jurusan, setJurusan] = useState([]);
+    const [lemari, setLemari] = useState([]);
+    const [penempatanBarang, setPenempatanBarang] = useState([]);
 
     const setUser = (user) => {
         _setUser(user);
@@ -43,7 +49,7 @@ export const ContextProvider = ({ children }) => {
     }
 
     return (
-        <StateContext.Provider value={{ user, token, jurusan, ruangan, setUser, setToken, setJurusan, setRuangan}}>
+        <StateContext.Provider value={{ user, token, jurusan, ruangan, lemari, penempatanBarang, setUser, setToken, setJurusan, setRuangan, setLemari, setPenempatanBarang }}>
             {children}
         </StateContext.Provider>
     )

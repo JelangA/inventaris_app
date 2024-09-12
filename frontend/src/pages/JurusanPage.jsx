@@ -3,60 +3,59 @@ import { useParams, Link } from 'react-router-dom';
 import DataTable from "../components/DataTable.jsx";
 import { useStateContext } from '../contexts/ContextProvider.jsx';
 import { getDataBarang } from '../api/barangApi.js';
-import { getDataLemari } from '../api/lemariApi.js';
+import { getDataLemari, getDataLemariById } from '../api/lemariApi.js';
 import { getDataPenempatanLemari } from "../api/penempatanLApi.js";
 import { getDataPenempatanRuangan } from "../api/penempatanRApi.js";
 
 function JurusanPage() {
-    const { id } = useParams();
+    const { idJurusan, idLemari } = useParams();
     const { user, jurusan } = useStateContext();
     const [barang, setBarang] = useState([]);
-    const [additionalData, setAdditionalData] = useState([]);
+    const [penempatanLemari, setPenempatanLemari] = useState([]);
     const [jurusanDetail, setJurusanDetail] = useState({});
-    const [isLoading, setIsLoading] = useState(true);
+    const [alert, setAlert] = useState({
+        status: false,
+        type: '',
+        message: ''
+    });
     const [lemari, setLemari] = useState([]);
-    const penempatanBarang = JSON.parse(localStorage.getItem('penempatanBarang'));
-
-    useEffect(() => {
-		if (additionalData.length !== 0) {
-			setIsLoading(false);
-		}
-	}, [additionalData]);
+    const [noLemari, setNoLemari] = useState('');
 
     useEffect(() => {
         const fetchDataBarang = async () => {
-            let fetchedAdditionalData = [];
             await getDataBarang().then((res) => {
-                console.log(res);
-                console.log(penempatanBarang);
-                console.log(lemari);
-                const barangJurusan = res.filter((brg) => penempatanBarang.find((pb) => pb.id_barang == brg.id && lemari.find((l) => l.id == pb.id_lemari && l.id_jurusan == id)));
+                const barangJurusan = res.filter((brg) => penempatanLemari.find((pb) => pb.id_barang == brg.id && lemari.find((l) => l.id == pb.id_lemari && l.id_jurusan == idJurusan && l.no_lemari == idLemari)));
                 setBarang(barangJurusan);
             });
-            await getDataPenempatanLemari().then((res) => {
-                fetchedAdditionalData = [...fetchedAdditionalData, res];
-            });
-            await getDataPenempatanRuangan().then((res) => {
-                fetchedAdditionalData = [...fetchedAdditionalData, res];
-            });
-            setAdditionalData(fetchedAdditionalData);
         }
+        const fetchDataPenempatanLemari = async () => {
+            await getDataPenempatanLemari().then((res) => {
+                setPenempatanLemari(res);
+            });
+        }
+        fetchDataPenempatanLemari();
         fetchDataBarang();
     }, [lemari]);
 
     useEffect(() => {
+        const fetchDataLemariById = async () => {
+            await getDataLemariById(idLemari).then((res) => {
+                setNoLemari(res.no_lemari); 
+            });
+        }
         const fetchDataLemari = async () => {
             await getDataLemari().then((res) => {
-                const lemariJurusan = res.filter((l) => l.id_jurusan == id);
+                const lemariJurusan = res.filter((l) => l.id_jurusan == idJurusan);
                 setLemari(lemariJurusan);
             });
         }
         fetchDataLemari();
+        fetchDataLemariById();
         setJurusanDetail(() => {
-            let newJurusanDetail = jurusan.find((j) => j.id == id);
+            let newJurusanDetail = jurusan.find((j) => j.id == idJurusan);
             return newJurusanDetail;
         });
-    }, [id, jurusan]);
+    }, [idJurusan, idLemari, jurusan]);
 
     if (!jurusanDetail) {
         return <div>Loading...</div>;
@@ -65,6 +64,13 @@ function JurusanPage() {
     return (
         <div className="content-wrapper">
             <section className="content-header">
+            {
+                    alert.status &&
+                    <div className={`alert alert-${alert.type} alert-dismissible fade show`} role="alert">
+                        {alert.message}
+                        <button onClick={() => setAlert({...alert, status: false})} type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
                 <div className="container-fluid">
                     <div className="row mb-2">
                         <div className="col-sm-6">
@@ -101,11 +107,24 @@ function JurusanPage() {
                                                     />
                                                 </div>
                                             </div>
+                                            <div className="form-group row mb-0 mt-3">
+                                                <label htmlFor="namaRuangan" className="col-sm-2 col-form-label">No Lemari</label>
+                                                <div className="col-sm-4">
+                                                    <input
+                                                        type="text"
+                                                        readOnly
+                                                        className="form-control-plaintext"
+                                                        id="namaRuangan"
+                                                        value={"Lemari " + noLemari}
+                                                        disabled
+                                                    />
+                                                </div>
+                                            </div>
                                         </form>
                                     </div>
                                 </div>
                                 <div className="card-body">
-                                    <DataTable data={barang} idRJ={id} type={'jurusanBarang'} role={user.tipe_user} />
+                                    <DataTable data={barang} setData={setBarang} idRJ={idJurusan} idLemari={idLemari} type={'jurusanBarang'} role={user.tipe_user} alert={alert} setAlert={setAlert} />
                                 </div>
                             </div>
                         </div>

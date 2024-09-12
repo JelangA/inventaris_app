@@ -46,10 +46,29 @@ import { useNavigate, Link } from "react-router-dom";
 import { deleteDataPenempatanLemari } from "../api/penempatanLApi.js";
 import { deleteDataPenempatanRuangan } from "../api/penempatanRApi.js";
 
-const DataTable = ({ data, setData, additionalData, idRJ, type, role }) => {
+const DataTable = ({
+	data,
+	setData,
+	additionalData,
+	idRJ,
+	idLemari,
+	idRB,
+	idRuangan,
+	idJurusan,
+	type,
+	role,
+	setAlert,
+}) => {
 	const [validationErrors, setValidationErrors] = useState({});
-	const { user, jurusan, ruangan, setJurusan, setRuangan } =
-		useStateContext();
+	const {
+		user,
+		jurusan,
+		ruangan,
+		lemari,
+		setJurusan,
+		setRuangan,
+		setLemari,
+	} = useStateContext();
 	const [penempatanBarang, setPenempatanBarang] = useState([]);
 	const [penempatanLemari, setPenempatanLemari] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
@@ -73,7 +92,7 @@ const DataTable = ({ data, setData, additionalData, idRJ, type, role }) => {
 	}, [penempatanBarang]);
 
 	useEffect(() => {
-		if (type === 'lemari') {
+		if (type === "lemari") {
 			if (data.length > 0) {
 				setPenempatanLemari(data);
 			}
@@ -81,12 +100,16 @@ const DataTable = ({ data, setData, additionalData, idRJ, type, role }) => {
 	}, [data]);
 
 	useEffect(() => {
-		if (type === 'lemari') {
+		if (type === "lemari") {
 			if (penempatanLemari.length > 0) {
-				setIsLoading(false);			
+				setIsLoading(false);
 			}
 		}
 	}, [penempatanLemari]);
+
+	useEffect(() => {
+		setIsLoading(true);
+	}, [type]);
 
 	const jurusanColumns = [
 		{
@@ -158,8 +181,8 @@ const DataTable = ({ data, setData, additionalData, idRJ, type, role }) => {
 					src={cell.getValue()}
 					alt="Foto"
 					style={{
-						width: "200px",
-						height: "100px",
+						width: "160px",
+						height: "90px",
 						objectFit: "cover",
 					}}
 				/>
@@ -267,69 +290,21 @@ const DataTable = ({ data, setData, additionalData, idRJ, type, role }) => {
 					(p) => p.id_barang == cell.row.original.id
 				);
 				if (penempatan && penempatan.id_lemari) {
-					const localStorageObject = {
-						id_lemari: penempatan.id_lemari,
-						id_penempatan: penempatan.id,
-						id_barang: cell.row.original.id,
-					};
-					let existingObject = JSON.parse(
-						localStorage.getItem("penempatanBarang")
-					);
-					if (existingObject == null) {
-						existingObject = [];
-					}
-					if (
-						!existingObject.some(
-							(obj) =>
-								JSON.stringify(obj) ===
-								JSON.stringify(localStorageObject)
-						)
-					) {
-						existingObject.push(localStorageObject);
-						localStorage.setItem(
-							"penempatanBarang",
-							JSON.stringify(existingObject)
-						);
-					}
-					return (
-						<Link to="/master/lemari">
-							Lemari {penempatan.id_lemari}
-						</Link>
-					);
+					const noLemari = lemari.find(
+						(l) => l.id == penempatan.id_lemari
+					).no_lemari;
+					return <Link to="/master/lemari">Lemari {noLemari}</Link>;
 				}
 				if (penempatan && penempatan.id_ruangan) {
-					const localStorageObject = {
-						id_ruangan: penempatan.id_ruangan,
-						id_penempatan: penempatan.id,
-						id_barang: cell.row.original.id,
-					};
-					let existingObject = JSON.parse(
-						localStorage.getItem("penempatanBarang")
-					);
-					if (existingObject == null) {
-						existingObject = [];
-					}
-					if (
-						!existingObject.some(
-							(obj) =>
-								JSON.stringify(obj) ===
-								JSON.stringify(localStorageObject)
-						)
-					) {
-						existingObject.push(localStorageObject);
-						localStorage.setItem(
-							"penempatanBarang",
-							JSON.stringify(existingObject)
-						);
-					}
 					return (
 						<Link to="/master/ruangan">
 							Ruangan{" "}
-							{
+							{ruangan.find(
+								(r) => r.id == penempatan.id_ruangan
+							) &&
 								ruangan.find(
 									(r) => r.id == penempatan.id_ruangan
-								).nama_ruangan
-							}
+								).nama_ruangan}
 						</Link>
 					);
 				}
@@ -425,9 +400,10 @@ const DataTable = ({ data, setData, additionalData, idRJ, type, role }) => {
 		Cell: ({ cell }) => {
 			const penempatan = penempatanLemari.find(
 				(p) => p.id == cell.row.original.id
-			)
+			);
 			if (penempatan) {
-				return jurusan.find((j) => j.id == penempatan.id_jurusan).jurusan;
+				return jurusan.find((j) => j.id == penempatan.id_jurusan)
+					.jurusan;
 			}
 			return null;
 		},
@@ -494,20 +470,6 @@ const DataTable = ({ data, setData, additionalData, idRJ, type, role }) => {
 					setValidationErrors({
 						...validationErrors,
 						no_hp: undefined,
-					}),
-			},
-		},
-		{
-			accessorKey: "password",
-			header: "Password",
-			muiEditTextFieldProps: {
-				required: true,
-				error: !!validationErrors?.password,
-				helperText: validationErrors?.password,
-				onFocus: () =>
-					setValidationErrors({
-						...validationErrors,
-						password: undefined,
 					}),
 			},
 		},
@@ -633,7 +595,9 @@ const DataTable = ({ data, setData, additionalData, idRJ, type, role }) => {
 				tableType.deleteFunction = deleteDataRuangan;
 				break;
 			case "lemari":
-				tableType.columns = isLoading ? lemariColumns : [...lemariColumns, lemariColumn];
+				tableType.columns = isLoading
+					? lemariColumns
+					: [...lemariColumns, lemariColumn];
 				tableType.createFunction = addDataLemari;
 				tableType.editFunction = editDataLemari;
 				tableType.deleteFunction = deleteDataLemari;
@@ -663,36 +627,92 @@ const DataTable = ({ data, setData, additionalData, idRJ, type, role }) => {
 				data,
 				createDisplayMode: "modal",
 				editDisplayMode: "row",
-				enableEditing: true,
+				enableEditing: type !== "pengadaan",
 				getRowId: (row) => row.id,
 				onCreatingRowCancel: () => setValidationErrors({}),
 				onCreatingRowSave: async ({ values, table }) => {
 					// Tambahkan logika simpan
 					let newData;
 					console.log(values);
-					await tableMemo.createFunction(values).then((res) => {
-						console.log(res);
-						newData = res.data.data;
-						setData((prevData) => [...prevData, newData]);
-					});
+					await tableMemo
+						.createFunction(values)
+						.then((res) => {
+							console.log(res);
+							newData = res.data.data;
+							setData((prevData) => [...prevData, newData]);
+							setAlert({
+								status: true,
+								type: "success",
+								message: "Data berhasil ditambahkan",
+							});
+						})
+						.catch((err) => {
+							setAlert({
+								status: true,
+								type: "error",
+								message:
+									"Data gagal ditambahkan: " +
+									err.response.data.message,
+							});
+						});
 					table.setCreatingRow(null);
 					if (type === "jurusan") {
 						setJurusan((prevData) => [...prevData, newData]);
 					}
+					if (type === "ruangan") {
+						setRuangan((prevData) => [...prevData, newData]);
+					}
+					if (type === "lemari") {
+						setLemari((prevData) => [...prevData, newData]);
+					}
 				},
 				onEditingRowCancel: () => setValidationErrors({}),
 				onEditingRowSave: async ({ values, table }) => {
-					await tableMemo.editFunction(values.id, values).then(() => {
-						setData((prevData) =>
+					await tableMemo
+						.editFunction(values.id, values)
+						.then(() => {
+							setData((prevData) =>
+								prevData.map((dataElement) =>
+									dataElement.id === values.id
+										? values
+										: dataElement
+								)
+							);
+							setAlert({
+								status: true,
+								type: "success",
+								message: "Data berhasil diubah",
+							});
+						})
+						.catch((err) => {
+							setAlert({
+								status: true,
+								type: "error",
+								message:
+									"Data gagal diubah: " +
+									err.response.data.message,
+							});
+						});
+					if (type === "jurusan") {
+						setJurusan((prevData) =>
 							prevData.map((dataElement) =>
 								dataElement.id === values.id
 									? values
 									: dataElement
 							)
 						);
-					});
-					if (type === "jurusan") {
-						setJurusan((prevData) =>
+					}
+					if (type === "ruangan") {
+						setRuangan((prevData) =>
+							prevData.map((dataElement) =>
+								dataElement.id === values.id
+									? values
+									: dataElement
+							)
+						);
+					}
+					if (type === "lemari") {
+						setLemari((prevData) =>
 							prevData.map((dataElement) =>
 								dataElement.id === values.id
 									? values
@@ -703,15 +723,25 @@ const DataTable = ({ data, setData, additionalData, idRJ, type, role }) => {
 					table.setEditingRow(null);
 				},
 				renderRowActions: ({ row, table }) =>
-					type !== 'pengadaan' && (
+					type !== "pengadaan" && (
 						<Box sx={{ display: "flex", gap: "1rem" }}>
 							<Tooltip title="Edit">
 								<IconButton
 									onClick={
-										["ruangan", "barang"].includes(type)
+										["barang"].includes(type)
 											? () =>
 													navigate(
 														`/form/${type}/${row.id}`
+													)
+											: ["ruanganBarang"].includes(type)
+											? () =>
+													navigate(
+														`/form/edit/${type}/${idRuangan}/${row.id}`
+													)
+											: ["jurusanBarang"].includes(type)
+											? () =>
+													navigate(
+														`/form/edit/${type}/${idRJ}/${idLemari}/${row.id}`
 													)
 											: () => table.setEditingRow(row)
 									}>
@@ -739,9 +769,40 @@ const DataTable = ({ data, setData, additionalData, idRJ, type, role }) => {
 													.deleteFunction(row.id)
 													.then(async () => {
 														if (type === "barang") {
-															deleteDataPenempatanLemari(
-																penempatanId
-															);
+															let penempatan;
+															for (
+																let i = 0;
+																i <
+																penempatanBarang.length;
+																i++
+															) {
+																penempatan =
+																	penempatanBarang[
+																		i
+																	].find(
+																		(p) =>
+																			p.id_barang ==
+																			row.id
+																	);
+																if (
+																	penempatan
+																) {
+																	break;
+																}
+															}
+															if (
+																penempatan.id_lemari
+															) {
+																deleteDataPenempatanLemari(
+																	penempatan.id
+																);
+															} else if (
+																penempatan.id_ruangan
+															) {
+																deleteDataPenempatanRuangan(
+																	penempatan.id
+																);
+															}
 														}
 														setData((prevData) =>
 															prevData.filter(
@@ -750,28 +811,48 @@ const DataTable = ({ data, setData, additionalData, idRJ, type, role }) => {
 																	row.id
 															)
 														);
+														setAlert({
+															status: true,
+															type: "success",
+															message:
+																"Data berhasil dihapus",
+														});
+													})
+													.catch((err) => {
+														console.log(err);
+														setAlert({
+															status: true,
+															type: "error",
+															message:
+																"Data gagal dihapus: " +
+																err.response
+																	.data
+																	.message,
+														});
 													});
-												if (
-													type === "jurusan" ||
-													type === "ruangan"
-												) {
-													type === "jurusan"
-														? setJurusan(
-																(prevData) =>
-																	prevData.filter(
-																		(r) =>
-																			r.id !==
-																			row.id
-																	)
-														  )
-														: setRuangan(
-																(prevData) =>
-																	prevData.filter(
-																		(r) =>
-																			r.id !==
-																			row.id
-																	)
-														  );
+												if (type === "jurusan") {
+													setJurusan((prevData) =>
+														prevData.filter(
+															(r) =>
+																r.id !== row.id
+														)
+													);
+												}
+												if (type === "ruangan") {
+													setRuangan((prevData) =>
+														prevData.filter(
+															(r) =>
+																r.id !== row.id
+														)
+													);
+												}
+												if (type === "lemari") {
+													setLemari((prevData) =>
+														prevData.filter(
+															(r) =>
+																r.id !== row.id
+														)
+													);
 												}
 											}
 										}
@@ -792,15 +873,17 @@ const DataTable = ({ data, setData, additionalData, idRJ, type, role }) => {
 									onClick={
 										["ruangan", "barang"].includes(type)
 											? () => navigate(`/form/${type}`)
-											: [
-													"ruanganBarang",
-													"jurusanBarang",
-											  ].includes(type)
+											: ["ruanganBarang"].includes(type)
 											? () =>
 													navigate(
-														`/form/${type}/${idRJ}`
+														`/form/add/${type}/${idRJ}`
 													)
-											: () => table.setCreatingRow(true)
+											: ["jurusanBarang"].includes(type)
+											? () =>
+													navigate(
+														`/form/add/${type}/${idRJ}/${idLemari}`
+													)
+											: ["pengadaan"].includes(type) ? () => navigate('/pengadaan/add') : () => table.setCreatingRow(true)
 									}>
 									Create New Row
 								</Button>
@@ -870,15 +953,16 @@ const DataTable = ({ data, setData, additionalData, idRJ, type, role }) => {
 									onClick={
 										["ruangan", "barang"].includes(type)
 											? () => navigate(`/form/${type}`)
-											: [
-													"ruanganBarang",
-													"jurusanBarang",
-											  ].includes(type)
+											: ["ruanganBarang"].includes(type)
 											? () =>
 													navigate(
-														`/form/${type}/${idRJ}`
+														`/form/add/${type}/${idRJ}`
 													)
-											: () => table.setCreatingRow(true)
+											: ["jurusanBarang"].includes(type)
+											? navigate(
+													`/form/add/${type}/${idRJ}/${idLemari}`
+											  )
+											: ["pengadaan"].includes(type) ? () => navigate('/pengadaan/add') : () => table.setCreatingRow(true)
 									}>
 									Create New Row
 								</Button>
@@ -897,26 +981,98 @@ const DataTable = ({ data, setData, additionalData, idRJ, type, role }) => {
 				),
 		  });
 
+	const generateTableHTML = (columns, data) => {
+		const headers = columns
+			.map((col) => {
+				if (
+					["foto_barang", "id_penempatan"].includes(col.accessorKey)
+				) {
+					return null;
+				} else {
+					return `<th>${col.header}</th>`;
+				}
+			})
+			.join("");
+		const rows = data
+			.map((row) => {
+				const rowHTML = columns
+					.map((col) => {
+						if (
+							["foto_barang", "id_penempatan"].includes(
+								col.accessorKey
+							)
+						) {
+							return null;
+						} else {
+							return `<td>${row[col.accessorKey]}</td>`;
+						}
+					})
+					.join("");
+				return `<tr>${rowHTML}</tr>`;
+			})
+			.join("");
+
+		return `
+			  <table class="print-table">
+				<thead>
+				  <tr>${headers}</tr>
+				</thead>
+				<tbody>
+				  ${rows}
+				</tbody>
+			  </table>
+			`;
+	};
+
 	const handlePrint = () => {
 		const printWindow = window.open("", "", "height=600,width=800");
-		printWindow.document.write("<html><head><title>Print</title>");
-		printWindow.document.write("</head><body >");
-		printWindow.document.write("<h1>Tabel Ruangan</h1>");
-		printWindow.document.write('<table border="1">');
-		printWindow.document.write("<thead><tr>");
-		columns.forEach((col) => {
-			printWindow.document.write(`<th>${col.header}</th>`);
-		});
-		printWindow.document.write("</tr></thead><tbody>");
-		data.forEach((row) => {
-			printWindow.document.write("<tr>");
-			columns.forEach((col) => {
-				printWindow.document.write(`<td>${row[col.accessorKey]}</td>`);
-			});
-			printWindow.document.write("</tr>");
-		});
-		printWindow.document.write("</tbody></table>");
-		printWindow.document.write("</body></html>");
+		const tableHTML = generateTableHTML(columns, data);
+
+		const styles = `
+			  <style>
+				body {
+				  font-family: Arial, sans-serif;
+				  padding: 20px;
+				}
+				h1 {
+				  text-align: center;
+				  margin-bottom: 20px;
+				}
+				.print-table {
+				  width: 100%;
+				  border-collapse: collapse;
+				  margin-bottom: 20px;
+				}
+				.print-table th, .print-table td {
+				  border: 1px solid #ddd;
+				  padding: 8px;
+				  text-align: left;
+				}
+				.print-table th {
+				  background-color: #f2f2f2;
+				}
+				.print-table tr:nth-child(even) {
+				  background-color: #f9f9f9;
+				}
+				.print-table tr:hover {
+				  background-color: #f1f1f1;
+				}
+			  </style>
+			`;
+
+		printWindow.document.write(`
+			  <html>
+				<head>
+				  <title>Print</title>
+				  ${styles}
+				</head>
+				<body>
+				  <h1>Data</h1>
+				  ${tableHTML}
+				</body>
+			  </html>
+			`);
+
 		printWindow.document.close();
 		printWindow.focus();
 		printWindow.print();

@@ -13,20 +13,28 @@ import {
 import {
 	addDataPenempatanLemari,
 	editDataPenempatanLemari,
+	getDataPenempatanLemari,
 	getDataPenempatanLemariById,
 } from "../api/penempatanLApi.js";
 import {
 	addDataPenempatanRuangan,
 	editDataPenempatanRuangan,
+	getDataPenempatanRuangan,
 	getDataPenempatanRuanganById,
 } from "../api/penempatanRApi.js";
 import { useStateContext } from "../contexts/ContextProvider.jsx";
 import { getDataLemari } from "../api/lemariApi";
 
 export default function FormPage() {
-	const { param, id, idRJ } = useParams();
+	const { param, idRB, idJurusan, idRuangan, idLemari } = useParams();
 	const navigate = useNavigate();
-	const { jurusan, ruangan, setRuangan } = useStateContext();
+	const {
+		jurusan,
+		ruangan,
+		penempatanBarang,
+		setRuangan,
+		setPenempatanBarang,
+	} = useStateContext();
 	const [formData, setFormData] = useState({});
 	const [penempatanData, setPenempatanData] = useState({
 		id_lemari: -1,
@@ -38,65 +46,117 @@ export default function FormPage() {
 	const [lemari, setLemari] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [penempatan, setPenempatan] = useState("");
-	const penempatanId = localStorage.getItem("penempatanId");
+	const [penempatanId, setPenempatanId] = useState(null);
 
 	useEffect(() => {
-		const fetchRuanganDataById = async () => {
-			await getDataRuanganById(id).then((res) => {
-				setFormData(res);
-			});
-		};
-		const fetchBarangDataById = async () => {
-			await getDataBarang().then((res) => {
-				setFormData(() => {
-					let barangData = res.find((item) => item.id == id);
-					barangData = {
-						...barangData,
-						pengadaan: barangData.pengadaan.split("T")[0],
-					};
-					console.log(barangData);
-					return barangData;
-				});
-			});
-		};
 		const fetchPenempatanDataById = async () => {
 			if (penempatan === "ruangan") {
+				console.log(penempatanId);
 				await getDataPenempatanRuanganById(penempatanId).then((res) => {
-					console.log(res);
 					if (penempatan.id_ruangan !== undefined) {
 						setPenempatan("ruangan");
 					}
 				});
 			} else {
+				console.log(penempatanId);
 				await getDataPenempatanLemariById(penempatanId).then((res) => {
-					console.log(res);
 					if (penempatan.id_lemari !== undefined) {
 						setPenempatan("lemari");
 					}
 				});
 			}
 		};
+		if (penempatanId) {
+			fetchPenempatanDataById();
+		}
+	}, [penempatanId]);
+
+	useEffect(() => {
+		const fetchBarangDataById = async () => {
+			await getDataBarang().then((res) => {
+				setFormData(() => {
+					let barangData = res.find((item) => item.id == idRB);
+					barangData = {
+						...barangData,
+						pengadaan: barangData.pengadaan.split("T")[0],
+					};
+					return barangData;
+				});
+			});
+		};
 		const fetchLemariData = async () => {
 			await getDataLemari().then((res) => {
 				setLemari(res);
 			});
 		};
+		const fetchPenempatanRuangan = async () => {
+			await getDataPenempatanRuangan().then((res) => {
+				setPenempatanData({
+					id_ruangan: res.find((item) => item.id_barang == idRB).id_ruangan
+				});
+				setPenempatanId(res.find((item) => item.id_barang == idRB).id);
+			});
+		};
+		const fetchPenempatanLemari = async () => {
+			await getDataPenempatanLemari().then((res) => {
+				console.log(res.find((item) => item.id_barang == idRB));
+				setPenempatanData({
+					id_lemari: res.find((item) => item.id_barang == idRB).id_lemari
+				});
+				setPenempatanId(res.find((item) => item.id_barang == idRB).id);
+			});
+		};
 		const fetchData = async () => {
-			if (param === "ruangan") {
-				if (id) {
-					await fetchRuanganDataById();
-					await fetchPenempatanDataById();
+			if (param === "ruanganBarang") {
+				if (idRB && location.pathname.includes('/edit/')) {
+					// Edit Barang from RuanganPage
+					await fetchBarangDataById();
+					await fetchPenempatanRuangan();
 				} else {
+					// Create Barang from RuanganPage
 					setFormData({
-						nama_ruangan: "",
-						luas_ruangan: 0,
-						inventaris_sapras: "",
+						no_inventaris: null,
+						nama_barang: "",
+						jenis_sarana: "",
+						foto_barang: null,
+						spesifikasi: "",
+						satuan: "",
+						jml_layak_pakai: 0,
+						jml_tidak_layak_pakai: 0,
+						sumber: "",
+						pengadaan: null,
+					});
+				}
+			} else if (param === "jurusanBarang") {
+				// jurusanPage
+				if (idRB && location.pathname.includes('/edit/')) {
+					// Edit Barang from JurusanPage
+					await fetchBarangDataById();
+					await fetchPenempatanLemari();
+				} else {
+					// Create Barang from JurusanPage
+					setFormData({
+						no_inventaris: null,
+						nama_barang: "",
+						jenis_sarana: "",
+						foto_barang: null,
+						spesifikasi: "",
+						satuan: "",
+						jml_layak_pakai: 0,
+						jml_tidak_layak_pakai: 0,
+						sumber: "",
+						pengadaan: null,
 					});
 				}
 			} else {
-				if (id) {
+				// MasterPage
+				if (idRB && location.pathname.includes('/edit/')) {
 					await fetchBarangDataById();
-					await fetchPenempatanDataById();
+					if (penempatan === "ruangan") {
+						await fetchPenempatanRuangan();
+					} else {
+						await fetchPenempatanLemari();
+					}
 				} else {
 					setFormData({
 						no_inventaris: null,
@@ -121,20 +181,28 @@ export default function FormPage() {
 			setPenempatan("lemari");
 		}
 		fetchData();
-	}, [param, id]);
+	}, [param, idRB]);
 
 	// Barang
 	useEffect(() => {
 		if (penempatanDataPayload) {
-			if (id && penempatanId) {
+			if (idRB && location.pathname.includes('/edit/') && penempatanId) {
 				if (penempatan === "ruangan") {
 					editDataPenempatanRuangan(
 						penempatanId,
 						penempatanDataPayload
 					)
-						.then((res) => {
-							console.log(res);
-							navigate(`/master/${param}`);
+						.then(() => {
+							if (param === "ruanganBarang") {
+								navigate(`/ruangan/${idRuangan}`);
+								window.location.reload();
+							} else if (param === "jurusanBarang") {
+								navigate(`/jurusan/${idJurusan}/${idLemari}`);
+								window.location.reload();
+							} else {
+								navigate(`/master/${param}`);
+								window.location.reload();
+							}
 						})
 						.catch((err) => console.log(err));
 				} else {
@@ -142,27 +210,51 @@ export default function FormPage() {
 						penempatanId,
 						penempatanDataPayload
 					)
-						.then((res) => {
-							console.log(res);
-							navigate(`/master/${param}`);
+						.then(() => {
+							if (param === "ruanganBarang") {
+								navigate(`/ruangan/${idRuangan}`);
+								window.location.reload();
+							} else if (param === "jurusanBarang") {
+								navigate(`/jurusan/${idJurusan}/${idLemari}`);
+								window.location.reload();
+							} else {
+								navigate(`/master/${param}`);
+								window.location.reload();
+							}
 						})
 						.catch((err) => console.log(err));
 				}
 			} else {
 				if (penempatan === "ruangan") {
 					addDataPenempatanRuangan(penempatanDataPayload)
-						.then((res) => {
-							console.log(res);
-							navigate(`/master/${param}`);
+						.then(() => {
+							if (param === "ruanganBarang") {
+								navigate(`/ruangan/${idRuangan}`);
+								window.location.reload();
+							} else if (param === "jurusanBarang") {
+								navigate(`/jurusan/${idJurusan}/${idLemari}`);
+								window.location.reload();
+							} else {
+								navigate(`/master/${param}`);
+								window.location.reload();
+							}
 						})
 						.catch((err) => {
 							console.log(err);
 						});
 				} else {
 					addDataPenempatanLemari(penempatanDataPayload)
-						.then((res) => {
-							console.log(res);
-							navigate(`/master/${param}`);
+						.then(() => {
+							if (param === "ruanganBarang") {
+								navigate(`/ruangan/${idRuangan}`);
+								window.location.reload();
+							} else if (param === "jurusanBarang") {
+								navigate(`/jurusan/${idJurusan}/${idLemari}`);
+								window.location.reload();
+							} else {
+								navigate(`/master/${param}`);
+								window.location.reload();
+							}
 						})
 						.catch((err) => {
 							console.log(err);
@@ -177,7 +269,7 @@ export default function FormPage() {
 		console.log(formData);
 		if (param === "ruangan") {
 			console.log(ruangan);
-			if (id) {
+			if (idRB && location.pathname.includes('/edit/')) {
 				// Edit Ruangan
 				await editDataRuangan(id, formData)
 					.then(() => {
@@ -193,7 +285,16 @@ export default function FormPage() {
 							});
 							return updatedRuangan;
 						});
-						navigate(`/master/${param}`);
+						if (param === "ruanganBarang") {
+							navigate(`/ruangan/${idRuangan}`);
+							window.location.reload();
+						} else if (param === "jurusanBarang") {
+							navigate(`/jurusan/${idJurusan}/${idLemari}`);
+							window.location.reload();
+						} else {
+							navigate(`/master/${param}`);
+							window.location.reload();
+						}
 					})
 					.catch((err) => {
 						console.log(err);
@@ -206,16 +307,25 @@ export default function FormPage() {
 							...prevState,
 							res.data.data,
 						]);
-						navigate(`/master/${param}`);
+						if (param === "ruanganBarang") {
+							navigate(`/ruangan/${idRuangan}`);
+							window.location.reload();
+						} else if (param === "jurusanBarang") {
+							navigate(`/jurusan/${idJurusan}/${idLemari}`);
+							window.location.reload();
+						} else {
+							navigate(`/master/${param}`);
+							window.location.reload();
+						}
 					})
 					.catch((err) => {
 						console.log(err);
 					});
 			}
 		} else {
-			if (id) {
+			if (idRB && location.pathname.includes('/edit/')) {
 				// Edit Barang
-				await editDataBarang(id, formData)
+				await editDataBarang(idRB, formData)
 					.then(() => {
 						if (penempatan === "ruangan") {
 							setPenempatanDataPayload(() => {
@@ -257,7 +367,10 @@ export default function FormPage() {
 						if (penempatan === "ruangan") {
 							setPenempatanDataPayload(() => {
 								const newState = {
-									id_ruangan: penempatanData.id_ruangan,
+									id_ruangan:
+										param === "ruanganBarang"
+											? idRuangan
+											: penempatanData.id_ruangan,
 									id_barang: res.data.data.id,
 									jumlah:
 										parseInt(formData.jml_layak_pakai) +
@@ -309,238 +422,7 @@ export default function FormPage() {
 
 	return loading ? (
 		<h1>Loading...</h1>
-	) : param === "ruangan" ? (
-		id ? ( // If id exists, Edit Ruangan
-			<div className="content-wrapper">
-				<section className="content-header">
-					<div className="container-fluid">
-						<div className="row mb-2">
-							<div className="col-sm-6">
-								<h1>
-									Form Edit{" "}
-									{formData.nama_ruangan &&
-										formatString(formData.nama_ruangan)}
-								</h1>
-							</div>
-							<div className="col-sm-6">
-								<ol className="breadcrumb float-sm-right">
-									<li className="breadcrumb-item">
-										<Link to="/">Home</Link>
-									</li>
-									<li className="breadcrumb-item active">
-										Edit {formatString(param)}
-									</li>
-								</ol>
-							</div>
-						</div>
-					</div>
-				</section>
-
-				<section className="content">
-					<div className="container-fluid">
-						<div className="row">
-							<div className="col-12">
-								<div className="card">
-									<div className="card-body">
-										<form onSubmit={onSubmit}>
-											<div className="form-floating mb-3">
-												<input
-													className="form-control"
-													id="inputNamaRuangan"
-													name="nama_ruangan"
-													type="text"
-													value={
-														formData.nama_ruangan
-													}
-													placeholder="Nama Ruangan"
-													onChange={(e) =>
-														setFormData({
-															...formData,
-															nama_ruangan:
-																e.target.value,
-														})
-													}
-												/>
-												<label htmlFor="inputNamaRuangan">
-													Nama Ruangan
-												</label>
-											</div>
-											<div className="form-floating mb-3">
-												<input
-													className="form-control"
-													id="inputLuasRuangan"
-													name="luas_ruangan"
-													type="number"
-													value={
-														formData.luas_ruangan
-													}
-													placeholder="Luas Ruangan"
-													onChange={(e) =>
-														setFormData({
-															...formData,
-															luas_ruangan:
-																e.target.value,
-														})
-													}
-												/>
-												<label htmlFor="inputLuasRuangan">
-													Luas Ruangan
-												</label>
-											</div>
-											<div className="form-floating mb-3">
-												<input
-													className="form-control"
-													id="inputInventarisSapras"
-													name="inventaris_sapras"
-													type="text"
-													value={
-														formData.inventaris_sapras
-													}
-													placeholder="Inventaris Sapras"
-													onChange={(e) =>
-														setFormData({
-															...formData,
-															inventaris_sapras:
-																e.target.value,
-														})
-													}
-												/>
-												<label htmlFor="inputInventarisSapras">
-													Inventaris Sapras
-												</label>
-											</div>
-											<div className="mt-4 mb-0">
-												<div className="d-grid">
-													<button
-														className="btn btn-primary btn-block"
-														type="submit">
-														Submit
-													</button>
-												</div>
-											</div>
-										</form>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</section>
-			</div>
-		) : (
-			// Else, Create Ruangan
-			<div className="content-wrapper">
-				<section className="content-header">
-					<div className="container-fluid">
-						<div className="row mb-2">
-							<div className="col-sm-6">
-								<h1>Form Create {formatString(param)}</h1>
-							</div>
-							<div className="col-sm-6">
-								<ol className="breadcrumb float-sm-right">
-									<li className="breadcrumb-item">
-										<Link to="/">Home</Link>
-									</li>
-									<li className="breadcrumb-item active">
-										Create {formatString(param)}
-									</li>
-								</ol>
-							</div>
-						</div>
-					</div>
-				</section>
-
-				<section className="content">
-					<div className="container-fluid">
-						<div className="row">
-							<div className="col-12">
-								<div className="card">
-									<div className="card-body">
-										<form onSubmit={onSubmit}>
-											<div className="form-floating mb-3">
-												<input
-													className="form-control"
-													id="inputNamaRuangan"
-													name="nama_ruangan"
-													type="text"
-													value={
-														formData.nama_ruangan
-													}
-													placeholder="Nama Ruangan"
-													onChange={(e) =>
-														setFormData({
-															...formData,
-															nama_ruangan:
-																e.target.value,
-														})
-													}
-												/>
-												<label htmlFor="inputNamaRuangan">
-													Nama Ruangan
-												</label>
-											</div>
-											<div className="form-floating mb-3">
-												<input
-													className="form-control"
-													id="inputLuasRuangan"
-													name="luas_ruangan"
-													type="number"
-													value={
-														formData.luas_ruangan
-													}
-													placeholder="Luas Ruangan"
-													onChange={(e) =>
-														setFormData({
-															...formData,
-															luas_ruangan:
-																e.target.value,
-														})
-													}
-												/>
-												<label htmlFor="inputLuasRuangan">
-													Luas Ruangan
-												</label>
-											</div>
-											<div className="form-floating mb-3">
-												<input
-													className="form-control"
-													id="inputInventarisSapras"
-													name="inventaris_sapras"
-													type="text"
-													value={
-														formData.inventaris_sapras
-													}
-													placeholder="Inventaris Sapras"
-													onChange={(e) =>
-														setFormData({
-															...formData,
-															inventaris_sapras:
-																e.target.value,
-														})
-													}
-												/>
-												<label htmlFor="inputInventarisSapras">
-													Inventaris Sapras
-												</label>
-											</div>
-											<div className="mt-4 mb-0">
-												<div className="d-grid">
-													<button
-														className="btn btn-primary btn-block"
-														type="submit">
-														Submit
-													</button>
-												</div>
-											</div>
-										</form>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</section>
-			</div>
-		)
-	) : id ? ( // If id exists, Edit Barang
+	) : idRB && location.pathname.includes('/edit') ? ( // If id exists, Edit Barang
 		<div className="content-wrapper">
 			<section className="content-header">
 				<div className="container-fluid">
@@ -664,7 +546,11 @@ export default function FormPage() {
 													<img
 														src={preview}
 														alt="preview"
-														width="500"
+														style={{
+															objectFit: "cover",
+															maxWidth: "300px",
+															maxHeight: "300px",
+														}}
 													/>
 												)}
 											</div>
@@ -1070,14 +956,18 @@ export default function FormPage() {
 												accept="image/*"
 												onChange={(e) =>
 													imageUpload(e, setFormData)
-												} // TODO
+												}
 											/>
 											<div className="form-floating mt-3 mb-3">
 												{preview && (
 													<img
 														src={preview}
 														alt="preview"
-														width="500"
+														style={{
+															objectFit: "cover",
+															maxWidth: "300px",
+															maxHeight: "300px",
+														}}
 													/>
 												)}
 											</div>
@@ -1105,46 +995,60 @@ export default function FormPage() {
 										<div className="form-floating mb-3">
 											{param !== "ruanganBarang" &&
 												param !== "jurusanBarang" && (
-														<>
-															<select
-																className="form-select"
-																name="penempatan"
-																id="inputPenempatan"
+													<>
+														<select
+															className="form-select"
+															name="penempatan"
+															id="inputPenempatan"
+															value={penempatan}
+															onChange={(e) =>
+																setPenempatan(
+																	e.target
+																		.value
+																)
+															}>
+															<option
+																value={""}
+																disabled>
+																Pilih Penempatan
+															</option>
+															<option
 																value={
-																	penempatan
-																}
-																onChange={(e) =>
-																	setPenempatan(
-																		e.target
-																			.value
-																	)
+																	"ruangan"
 																}>
-																<option
-																	value={""}
-																	disabled>
-																	Pilih
-																	Penempatan
-																</option>
-																<option
-																	value={
-																		"ruangan"
-																	}>
-																	Ruangan
-																</option>
-																<option
-																	value={
-																		"lemari"
-																	}>
-																	Lemari
-																</option>
-															</select>
-															<label htmlFor="inputPenempatan">
-																Penempatan
-																Barang
-															</label>
-														</>
-													)}
+																Ruangan
+															</option>
+															<option
+																value={
+																	"lemari"
+																}>
+																Lemari
+															</option>
+														</select>
+														<label htmlFor="inputPenempatan">
+															Penempatan Barang
+														</label>
+													</>
+												)}
 										</div>
+										{param === "ruanganBarang" && (
+											<>
+												<div className="form-floating mb-3">
+													<input
+														className="form-control"
+														type="number"
+														name="id_ruangan"
+														id="inputIdRuangan"
+														placeholder="ID Ruangan"
+														value={idRuangan}
+														readOnly
+													/>
+													<label htmlFor="inputIdRuangan">
+														ID Ruangan
+													</label>
+												</div>
+											</>
+										)}
 										{param !== "ruanganBarang" &&
 											penempatan && (
 												<div className="form-floating mb-3">
@@ -1236,7 +1140,10 @@ export default function FormPage() {
 																							jur.id ==
 																							item.id_jurusan
 																					).jurusan;
-																				if (item.id_jurusan == idRJ) {
+																				if (
+																					item.id_jurusan ==
+																					idJurusan
+																				) {
 																					return (
 																						<option
 																							key={
@@ -1244,7 +1151,8 @@ export default function FormPage() {
 																							}
 																							value={
 																								item.id
-																							}>Lemari{" "}
+																							}>
+																							Lemari{" "}
 																							{
 																								item.no_lemari
 																							}{" "}
