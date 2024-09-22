@@ -14,11 +14,15 @@ const Ruangan = sequelize.define('Ruangan', {
         unique: true,
     },
     luas_ruangan: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         allowNull: false,
     },
     inventaris_sapras: {
         type: DataTypes.STRING,
+    },
+    id_jurusan: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
     },
 }, {
     tableName: 'ruangan',

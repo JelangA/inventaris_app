@@ -16,6 +16,10 @@ const PenempatanRuangan = sequelize.define('PenempatanRuangan', {
         type: DataTypes.INTEGER,
         allowNull: false,
     },
+    id_lemari: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+    },
     jumlah: {
         type: DataTypes.INTEGER,
         allowNull: false,

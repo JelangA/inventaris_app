@@ -1,6 +1,6 @@
 const Barang = require("../../models/barang");
 const {uploadImage} = require("../../utils/imageUploadHelper");
-const {responseErr} = require("../../utils/responseHelpers");
+const {responseErr, response} = require("../../utils/responseHelpers");
 const {join, basename} = require("node:path");
 const {existsSync, unlinkSync} = require("node:fs");
 const { createItem, updateItem, deleteItem, getById, getAll } = require("../../utils/crudHelper");
@@ -81,6 +81,28 @@ controller.delete = (req, res) => deleteItem(Barang, 'Barang', req.params.id, re
 controller.getById = (req, res) => getById(Barang, 'Barang', req.params.id, res);
 
 // Get all barang
-controller.getAll = (req, res) => getAll(Barang, res);
+controller.getAll = async (req, res) => {
+    try {
+        const items = await Barang.findAll(); // Retrieve all items
+        const formattedItems = items.map(item => ({
+            id: item.id,
+            no_inventaris: item.no_inventaris,
+            jenis_sarana: item.jenis_sarana,
+            nama_barang: item.nama_barang,
+            spesifikasi: item.spesifikasi,
+            satuan: item.satuan,
+            jml_layak_pakai: item.jml_layak_pakai,
+            jml_tidak_layak_pakai: item.jml_tidak_layak_pakai,
+            jumlah_total: item.jumlah_total,
+            sumber: item.sumber,
+            pengadaan: item.pengadaan,
+            foto_barang: item.foto_barang,
+        }));
+
+        return response(res, formattedItems); // Return all items
+    } catch (error) {
+        return responseErr(res, error.message, 500); // Return error message with HTTP status 500
+    }
+};
 
 module.exports = controller;

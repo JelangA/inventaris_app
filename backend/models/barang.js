@@ -48,6 +48,12 @@ const Barang = sequelize.define('Barang', {
         type: DataTypes.INTEGER,
         allowNull: false,
     },
+    jumlah_total: {
+        type: DataTypes.VIRTUAL,
+        get() {
+            return this.jml_layak_pakai + this.jml_tidak_layak_pakai;
+        }
+    }
 }, {
     tableName: 'barang',
     timestamps: false,

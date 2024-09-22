@@ -22,6 +22,10 @@ module.exports = {
       inventaris_sapras: {
         type: Sequelize.STRING,
       },
+      id_jurusan: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

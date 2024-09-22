@@ -18,6 +18,10 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
       },
+      id_lemari: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
       jumlah: {
         type: Sequelize.INTEGER,
         allowNull: false

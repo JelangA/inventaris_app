@@ -12,7 +12,7 @@ const Lemari = sequelize.define('Lemari', {
         type: DataTypes.STRING,
         allowNull: false,
     },
-    id_jurusan: {
+    id_ruangan: {
         type: DataTypes.INTEGER,
         allowNull: false,
     },
