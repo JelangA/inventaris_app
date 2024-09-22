@@ -3,25 +3,28 @@ import { createContext, setStateAction, useContext, useState } from 'react';
 const StateContext = createContext({
     user: null,
     token: null,
+    barang: [],
     ruangan: [],
     jurusan: [],
     lemari: [],
-    penempatanBarang: [],
+    penempatan: [],
     setUser: () => {},
     setToken: () => {},
+    setBarang: () => {},
     setRuangan: () => {},
     setJurusan: () => {},
     setLemari: () => {},
-    setPenempatanBarang: () => {}
+    setPenempatan: () => {}
 });
 
 export const ContextProvider = ({ children }) => {
     const [user, _setUser] = useState(sessionStorage.getItem('user') ? JSON.parse(sessionStorage.getItem('user')) : null);
     const [token, _setToken] = useState(sessionStorage.getItem('token'));
+    const [barang, setBarang] = useState([]);
     const [ruangan, setRuangan] = useState([]);
     const [jurusan, setJurusan] = useState([]);
     const [lemari, setLemari] = useState([]);
-    const [penempatanBarang, setPenempatanBarang] = useState([]);
+    const [penempatan, setPenempatan] = useState([]);
 
     const setUser = (user) => {
         _setUser(user);
@@ -49,7 +52,7 @@ export const ContextProvider = ({ children }) => {
     }
 
     return (
-        <StateContext.Provider value={{ user, token, jurusan, ruangan, lemari, penempatanBarang, setUser, setToken, setJurusan, setRuangan, setLemari, setPenempatanBarang }}>
+        <StateContext.Provider value={{ user, token, barang, jurusan, ruangan, lemari, penempatan, setUser, setToken, setBarang, setJurusan, setRuangan, setLemari, setPenempatan }}>
             {children}
         </StateContext.Provider>
     )

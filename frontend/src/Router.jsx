@@ -31,26 +31,8 @@ const routes = createBrowserRouter([
                 element: <Home />,
             },
             {
-                // Edit Barang from JurusanPage
-                path: '/form/edit/:param/:idJurusan/:idLemari/:idRB', // :param sudah pasti 'jurusanBarang'
-                element: (
-                    <ProtectedRoute allowedRoles={['admin', 'kep_jurusan', 'kep_bengkel']}>
-                        <FormPage />
-                    </ProtectedRoute>
-                )
-            },
-            {
-                // Add Barang from JurusanPage
-                path: '/form/add/:param/:idJurusan/:idLemari', // :param sudah pasti 'jurusanBarang'
-                element: (
-                    <ProtectedRoute allowedRoles={['admin', 'kep_jurusan', 'kep_bengkel']}>
-                        <FormPage />
-                    </ProtectedRoute>
-                )
-            },
-            {
                 // Edit Barang from RuanganPage
-                path: '/form/edit/:param/:idRuangan/:idRB', // :param sudah pasti 'ruanganBarang'
+                path: '/form/edit/:param/:idRuangan/:idRB/:idLemari?', // :param is either 'ruanganBarang' or 'lemariBarang'
                 element: (
                     <ProtectedRoute allowedRoles={['admin', 'kep_jurusan', 'kep_bengkel']}>
                         <FormPage />
@@ -59,7 +41,7 @@ const routes = createBrowserRouter([
             },
             {
                 // Add Barang from RuanganPage
-                path: '/form/add/:param/:idRuangan', // :param sudah pasti 'ruanganBarang'
+                path: '/form/add/:param/:idRuangan/:idLemari?', // :param is either 'ruanganBarang' or 'lemariBarang'
                 element: (
                     <ProtectedRoute allowedRoles={['admin', 'kep_jurusan', 'kep_bengkel']}>
                         <FormPage />
@@ -78,7 +60,7 @@ const routes = createBrowserRouter([
             {
                 path:'/ruangan/:id',
                 element: (
-                    <ProtectedRoute allowedRoles={['admin', 'staf_tu']}>
+                    <ProtectedRoute allowedRoles={['admin', 'kep_jurusan']}>
                         <RuanganPage />
                     </ProtectedRoute>
                 )
@@ -90,10 +72,6 @@ const routes = createBrowserRouter([
                         <GaleriPage />
                     </ProtectedRoute>
                 )
-            },
-            {
-                path:'/jurusan/:idJurusan/:idLemari',
-                element: <JurusanPage />,
             },
             {
                 path: '/pengadaan/add',

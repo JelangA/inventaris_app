@@ -50,11 +50,9 @@ const DataTable = ({
 	data,
 	setData,
 	additionalData,
-	idRJ,
 	idLemari,
 	idRB,
 	idRuangan,
-	idJurusan,
 	type,
 	role,
 	setAlert,
@@ -570,7 +568,7 @@ const DataTable = ({
 				tableType.editFunction = editDataBarang;
 				tableType.deleteFunction = deleteDataBarang;
 				break;
-			case "jurusanBarang":
+			case "lemariBarang":
 				tableType.columns = barangColumns;
 				tableType.createFunction = addDataBarang;
 				tableType.editFunction = editDataBarang;
@@ -734,10 +732,10 @@ const DataTable = ({
 													navigate(
 														`/form/edit/${type}/${idRuangan}/${row.id}`
 													)
-											: ["jurusanBarang"].includes(type)
+											: ["lemariBarang"].includes(type)
 											? () =>
 													navigate(
-														`/form/edit/${type}/${idRJ}/${idLemari}/${row.id}`
+														`/form/edit/${type}/${idRuangan}/${row.id}/${idLemari}`
 													)
 											: () => table.setEditingRow(row)
 									}>
@@ -872,13 +870,12 @@ const DataTable = ({
 											: ["ruanganBarang"].includes(type)
 											? () =>
 													navigate(
-														`/form/add/${type}/${idRJ}`
+														`/form/add/${type}/${idRuangan}`
 													)
-											: ["jurusanBarang"].includes(type)
-											? () =>
-													navigate(
-														`/form/add/${type}/${idRJ}/${idLemari}`
-													)
+											: ["lemariBarang"].includes(type)
+											? () => navigate(
+												`/form/add/${type}/${idRuangan}/${idLemari}`
+											)
 											: ["pengadaan"].includes(type) ? () => navigate('/pengadaan/add') : () => table.setCreatingRow(true)
 									}>
 									Create New Row
@@ -952,12 +949,12 @@ const DataTable = ({
 											: ["ruanganBarang"].includes(type)
 											? () =>
 													navigate(
-														`/form/add/${type}/${idRJ}`
+														`/form/add/${type}/${idRuangan}`
 													)
-											: ["jurusanBarang"].includes(type)
-											? navigate(
-													`/form/add/${type}/${idRJ}/${idLemari}`
-											  )
+											: ["lemariBarang"].includes(type)
+											? () => navigate(
+												`/form/add/${type}/${idRuangan}/${idLemari}`
+											)
 											: ["pengadaan"].includes(type) ? () => navigate('/pengadaan/add') : () => table.setCreatingRow(true)
 									}>
 									Create New Row

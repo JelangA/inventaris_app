@@ -14,6 +14,7 @@ const SideNav = () => {
 		ruangan,
 		jurusan,
 		lemari,
+		penempatan,
 		setUser,
 		setToken,
 		setRuangan,
@@ -164,13 +165,7 @@ const SideNav = () => {
 									<li className="nav-item">
 										<a
 											href="#"
-											className={`nav-link ${
-												location.pathname.includes(
-													"/ruangan/"
-												)
-													? "active"
-													: ""
-											}`}>
+											className="nav-link">
 											<i className="nav-icon fas fa-door-open" />
 											<p>
 												Ruangan{" "}
@@ -181,7 +176,7 @@ const SideNav = () => {
 											{ruangan.map((item) => {
 													const slug =
 														item.id;
-													return (
+													return item.id_jurusan ? null : (
 														<li
 															key={item.id}
 															className="nav-item">
@@ -209,13 +204,7 @@ const SideNav = () => {
 								<li className="nav-item">
 									<a
 										href="#"
-										className={`nav-link ${
-											location.pathname.includes(
-												"/jurusan/"
-											)
-												? "active"
-												: ""
-										}`}>
+										className="nav-link">
 										<i className="nav-icon fas fa-school" />
 										<p>
 											Jurusan{" "}
@@ -224,21 +213,15 @@ const SideNav = () => {
 									</a>
 									<ul className="nav nav-treeview">
 										{jurusan.map((item) => {
-												const idJurusan =
-													item.id;
+												const idJurusan = item.id;
+
 												return (
 													<li
 														key={item.id}
 														className="nav-item">
 														<a
 															href="#"
-															className={`nav-link ${
-																location.pathname.includes(
-																	`/jurusan/${idJurusan}`
-																)
-																	? "active"
-																	: ""
-															}`}>
+															className="nav-link">
 															<i className="nav-icon far fa-circle" />
 															<p>
 																{item.jurusan}
@@ -246,26 +229,26 @@ const SideNav = () => {
 															</p>
 														</a>
 														<ul className="nav-treeview">
-															{lemari.map((l) => {
-																if (l.id_jurusan == item.id) {
-																	const idLemari = l.id;
+															{ruangan.map((r) => {
+																if (r.id_jurusan == item.id) {
+																	const idRuangan = r.id;
 																	return (
 																		<li
-																			key={l.id}
+																			key={r.id}
 																			className="nav-item pl-4">
 																			<Link
-																				to={`/jurusan/${idJurusan}/${idLemari}`}
+																				to={`/ruangan/${idRuangan}`}
 																				className={`nav-link ${
 																					location.pathname.includes(
-																						`/jurusan/${idJurusan}/${idLemari}`
+																						`${idRuangan}`
 																					)
 																						? "active"
 																						: ""
 																				}`}>
 																				<p>
-																					Lemari{" "}
+																					Ruangan{" "}
 																					{
-																						l.no_lemari
+																						r.nama_ruangan
 																					}
 																				</p>
 																			</Link>
