@@ -24,20 +24,6 @@ export default function RegisterPage() {
 	const inputPasswordRef = useRef(null);
 	const inputPasswordConfirmRef = useRef(null);
 	const navigate = useNavigate();
-	const tempJurusan = [
-		{
-			id: 1,
-			jurusan: "RPL"
-		},
-		{
-			id: 2,
-			jurusan: "TKJ"
-		},
-		{
-			id: 3,
-			jurusan: "MM"
-		}
-	] // TODO: Delete this line after fetching data from the API
 
 	useEffect(() => {
 		const fetchJurusan = async () => {
@@ -281,7 +267,7 @@ export default function RegisterPage() {
 										</p>
 									)}
 								</div>
-								{tempJurusan.length > 0 && formData.tipe_user === "kep_jurusan" && (
+								{jurusan.length > 0 && formData.tipe_user === "kep_jurusan" && (
 									<div className="form-floating mb-3">
 										<select
 											className="form-select"
@@ -298,9 +284,9 @@ export default function RegisterPage() {
 											<option value={0} disabled>
 												Pilih Opsi
 											</option>
-											{tempJurusan.map((item) => {
+											{jurusan.map((item, index) => {
 												return (
-													<option value={item.id}>
+													<option key={index} value={item.id}>
 														{item.jurusan}
 													</option>
 												)
