@@ -1,21 +1,10 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import {
-	addDataRuangan,
-	editDataRuangan,
-	getDataRuanganById,
-} from "../api/ruanganApi.js";
-import {
 	addDataBarang,
 	editDataBarang,
 	getDataBarang,
 } from "../api/barangApi.js";
-import {
-	addDataPenempatanLemari,
-	editDataPenempatanLemari,
-	getDataPenempatanLemari,
-	getDataPenempatanLemariById,
-} from "../api/penempatanLApi.js";
 import {
 	addDataPenempatanRuangan,
 	editDataPenempatanRuangan,
@@ -28,13 +17,8 @@ import { getDataLemari } from "../api/lemariApi";
 export default function FormPage() {
 	const { param, idRB, idJurusan, idRuangan, idLemari } = useParams();
 	const navigate = useNavigate();
-	const {
-		jurusan,
-		ruangan,
-		penempatanBarang,
-		setRuangan,
-		setPenempatanBarang,
-	} = useStateContext();
+	const { jurusan, ruangan, barang, penempatan, setBarang, setPenempatan } =
+		useStateContext();
 	const [formData, setFormData] = useState({});
 	const [penempatanData, setPenempatanData] = useState({
 		id_lemari: -1,
@@ -45,26 +29,15 @@ export default function FormPage() {
 	const [preview, setPreview] = useState(null);
 	const [lemari, setLemari] = useState([]);
 	const [loading, setLoading] = useState(true);
-	const [penempatan, setPenempatan] = useState("");
-	const [penempatanId, setPenempatanId] = useState(null);
+	const [penempatanId, setPenempatanId] = useState(null); // id pada tabel penempatan_ruangan
+	const [penempatanDetail, setPenempatanDetail] = useState(null);
 
+	// Hanya digunakan saat edit barang
 	useEffect(() => {
 		const fetchPenempatanDataById = async () => {
-			if (penempatan === "ruangan") {
-				console.log(penempatanId);
-				await getDataPenempatanRuanganById(penempatanId).then((res) => {
-					if (penempatan.id_ruangan !== undefined) {
-						setPenempatan("ruangan");
-					}
-				});
-			} else {
-				console.log(penempatanId);
-				await getDataPenempatanLemariById(penempatanId).then((res) => {
-					if (penempatan.id_lemari !== undefined) {
-						setPenempatan("lemari");
-					}
-				});
-			}
+			await getDataPenempatanRuanganById(penempatanId).then((res) => {
+				setPenempatanDetail(res);
+			});
 		};
 		if (penempatanId) {
 			fetchPenempatanDataById();
@@ -92,174 +65,51 @@ export default function FormPage() {
 		const fetchPenempatanRuangan = async () => {
 			await getDataPenempatanRuangan().then((res) => {
 				setPenempatanData({
-					id_ruangan: res.find((item) => item.id_barang == idRB).id_ruangan
-				});
-				setPenempatanId(res.find((item) => item.id_barang == idRB).id);
-			});
-		};
-		const fetchPenempatanLemari = async () => {
-			await getDataPenempatanLemari().then((res) => {
-				console.log(res.find((item) => item.id_barang == idRB));
-				setPenempatanData({
+					id_ruangan: res.find((item) => item.id_barang == idRB)
+						.id_ruangan,
 					id_lemari: res.find((item) => item.id_barang == idRB).id_lemari
 				});
 				setPenempatanId(res.find((item) => item.id_barang == idRB).id);
 			});
 		};
 		const fetchData = async () => {
-			if (param === "ruanganBarang") {
-				if (idRB && (location.pathname.includes('/edit/') || param === 'barang')) {
-					// Edit Barang from RuanganPage
-					await fetchBarangDataById();
-					await fetchPenempatanRuangan();
-				} else {
-					// Create Barang from RuanganPage
-					setFormData({
-						no_inventaris: null,
-						nama_barang: "",
-						jenis_sarana: "",
-						foto_barang: null,
-						spesifikasi: "",
-						satuan: "",
-						jml_layak_pakai: 0,
-						jml_tidak_layak_pakai: 0,
-						sumber: "",
-						pengadaan: null,
-					});
-				}
-			} else if (param === "jurusanBarang") {
-				// jurusanPage
-				if (idRB && (location.pathname.includes('/edit/') || param === 'barang')) {
-					// Edit Barang from JurusanPage
-					await fetchBarangDataById();
-					await fetchPenempatanLemari();
-				} else {
-					// Create Barang from JurusanPage
-					setFormData({
-						no_inventaris: null,
-						nama_barang: "",
-						jenis_sarana: "",
-						foto_barang: null,
-						spesifikasi: "",
-						satuan: "",
-						jml_layak_pakai: 0,
-						jml_tidak_layak_pakai: 0,
-						sumber: "",
-						pengadaan: null,
-					});
-				}
-			} else {
-				// MasterPage
-				if (idRB && (location.pathname.includes('/edit/') || param === 'barang')) {
-					await fetchBarangDataById();
-					if (penempatan === "ruangan") {
-						await fetchPenempatanRuangan();
-					} else {
-						await fetchPenempatanLemari();
-					}
-				} else {
-					setFormData({
-						no_inventaris: null,
-						nama_barang: "",
-						jenis_sarana: "",
-						foto_barang: null,
-						spesifikasi: "",
-						satuan: "",
-						jml_layak_pakai: 0,
-						jml_tidak_layak_pakai: 0,
-						sumber: "",
-						pengadaan: null,
-					});
-				}
+			if (location.pathname.includes("/edit/")) {
+				await fetchBarangDataById();
+				await fetchPenempatanRuangan();
+			} else if (location.pathname.includes("/add/")) {
+				setFormData({
+					no_inventaris: null,
+					nama_barang: "",
+					jenis_sarana: "",
+					foto_barang: null,
+					spesifikasi: "",
+					satuan: "",
+					jml_layak_pakai: 0,
+					jml_tidak_layak_pakai: 0,
+					sumber: "",
+					pengadaan: null,
+				});
 			}
 			await fetchLemariData();
 			setLoading(false);
 		};
-		if (param === "ruanganBarang") {
-			setPenempatan("ruangan");
-		} else if (param === "jurusanBarang") {
-			setPenempatan("lemari");
-		}
 		fetchData();
 	}, [param, idRB]);
 
 	// Barang
 	useEffect(() => {
 		if (penempatanDataPayload) {
-			if (idRB && (location.pathname.includes('/edit/') || param === 'barang') && penempatanId) {
-				if (penempatan === "ruangan") {
-					editDataPenempatanRuangan(
-						penempatanId,
-						penempatanDataPayload
-					)
-						.then(() => {
-							if (param === "ruanganBarang") {
-								navigate(`/ruangan/${idRuangan}`);
-								window.location.reload();
-							} else if (param === "jurusanBarang") {
-								navigate(`/jurusan/${idJurusan}/${idLemari}`);
-								window.location.reload();
-							} else {
-								navigate(`/master/${param}`);
-								window.location.reload();
-							}
-						})
-						.catch((err) => console.log(err));
-				} else {
-					editDataPenempatanLemari(
-						penempatanId,
-						penempatanDataPayload
-					)
-						.then(() => {
-							if (param === "ruanganBarang") {
-								navigate(`/ruangan/${idRuangan}`);
-								window.location.reload();
-							} else if (param === "jurusanBarang") {
-								navigate(`/jurusan/${idJurusan}/${idLemari}`);
-								window.location.reload();
-							} else {
-								navigate(`/master/${param}`);
-								window.location.reload();
-							}
-						})
-						.catch((err) => console.log(err));
-				}
-			} else {
-				if (penempatan === "ruangan") {
-					addDataPenempatanRuangan(penempatanDataPayload)
-						.then(() => {
-							if (param === "ruanganBarang") {
-								navigate(`/ruangan/${idRuangan}`);
-								window.location.reload();
-							} else if (param === "jurusanBarang") {
-								navigate(`/jurusan/${idJurusan}/${idLemari}`);
-								window.location.reload();
-							} else {
-								navigate(`/master/${param}`);
-								window.location.reload();
-							}
-						})
-						.catch((err) => {
-							console.log(err);
-						});
-				} else {
-					addDataPenempatanLemari(penempatanDataPayload)
-						.then(() => {
-							if (param === "ruanganBarang") {
-								navigate(`/ruangan/${idRuangan}`);
-								window.location.reload();
-							} else if (param === "jurusanBarang") {
-								navigate(`/jurusan/${idJurusan}/${idLemari}`);
-								window.location.reload();
-							} else {
-								navigate(`/master/${param}`);
-								window.location.reload();
-							}
-						})
-						.catch((err) => {
-							console.log(err);
-						});
-				}
+			if (location.pathname.includes("/edit/")) {
+				editDataPenempatanRuangan(
+					penempatanId,
+					penempatanDataPayload
+				).then(() => {
+					window.history.back();
+				});
+			} else if (location.pathname.includes("/add/")) {
+				addDataPenempatanRuangan(penempatanDataPayload).then(() => {
+					window.history.back();
+				});
 			}
 		}
 	}, [penempatanDataPayload]);
@@ -267,139 +117,188 @@ export default function FormPage() {
 	const onSubmit = async (e) => {
 		e.preventDefault();
 		console.log(formData);
-		if (param === "ruangan") {
-			console.log(ruangan);
-			if (idRB && (location.pathname.includes('/edit/') || param === 'barang')) {
-				// Edit Ruangan
-				await editDataRuangan(id, formData)
-					.then(() => {
-						setRuangan((prevState) => {
-							const updatedRuangan = prevState.map((item) => {
-								if (item.id === id) {
-									return {
-										...item,
-										name: formData.name,
-									};
-								}
-								return item;
-							});
-							return updatedRuangan;
-						});
-						if (param === "ruanganBarang") {
-							navigate(`/ruangan/${idRuangan}`);
-							window.location.reload();
-						} else if (param === "jurusanBarang") {
-							navigate(`/jurusan/${idJurusan}/${idLemari}`);
-							window.location.reload();
-						} else {
-							navigate(`/master/${param}`);
-							window.location.reload();
-						}
-					})
-					.catch((err) => {
-						console.log(err);
+		if (["ruanganBarang", "lemariBarang"].includes(param)) {
+			if (location.pathname.includes("/edit/")) {
+				await editDataBarang(idRB, formData).then(() => {
+					setPenempatanDataPayload(() => {
+						const newState = {
+							id_ruangan: penempatanData.id_ruangan,
+							id_lemari: penempatanData.id_lemari == 'null' ? null : penempatanData.id_lemari,
+							id_barang: idRB,
+							jumlah:
+								parseInt(formData.jml_layak_pakai) +
+								parseInt(
+									formData.jml_tidak_layak_pakai
+								),
+						};
+						console.log(newState);
+						return newState;
 					});
-			} else {
-				// Create Ruangan
-				await addDataRuangan(formData)
-					.then((res) => {
-						setRuangan((prevState) => [
-							...prevState,
-							res.data.data,
-						]);
-						if (param === "ruanganBarang") {
-							navigate(`/ruangan/${idRuangan}`);
-							window.location.reload();
-						} else if (param === "jurusanBarang") {
-							navigate(`/jurusan/${idJurusan}/${idLemari}`);
-							window.location.reload();
-						} else {
-							navigate(`/master/${param}`);
-							window.location.reload();
-						}
-					})
-					.catch((err) => {
-						console.log(err);
+				});
+			} else if (location.pathname.includes("/add/")) {
+				await addDataBarang(formData).then((res) => {
+					setBarang([...barang, res]); // update barang state
+					setPenempatanDataPayload(() => {
+						const newState = {
+							id_ruangan: idRuangan,
+							id_lemari: idLemari,
+							id_barang: res.data.data.id,
+							jumlah:
+								parseInt(formData.jml_layak_pakai) +
+								parseInt(formData.jml_tidak_layak_pakai),
+						};
+						return newState;
 					});
+				});
 			}
 		} else {
-			if (idRB && (location.pathname.includes('/edit/') || param === 'barang')) {
-				// Edit Barang
-				await editDataBarang(idRB, formData)
-					.then(() => {
-						if (penempatan === "ruangan") {
-							setPenempatanDataPayload(() => {
-								const newState = {
-									id_ruangan: penempatanData.id_ruangan,
-									id_barang: formData.id,
-									jumlah:
-										parseInt(formData.jml_layak_pakai) +
-										parseInt(
-											formData.jml_tidak_layak_pakai
-										),
-								};
-								console.log(newState);
-								return newState;
-							});
-						} else {
-							setPenempatanDataPayload(() => {
-								const newState = {
-									id_lemari: penempatanData.id_lemari,
-									id_barang: formData.id,
-									jumlah:
-										parseInt(formData.jml_layak_pakai) +
-										parseInt(
-											formData.jml_tidak_layak_pakai
-										),
-								};
-								console.log(newState);
-								return newState;
-							});
-						}
-					})
-					.catch((err) => {
-						console.log(err);
-					});
-			} else {
-				// Create Barang
-				await addDataBarang(formData)
-					.then(async (res) => {
-						if (penempatan === "ruangan") {
-							setPenempatanDataPayload(() => {
-								const newState = {
-									id_ruangan:
-										param === "ruanganBarang"
-											? idRuangan
-											: penempatanData.id_ruangan,
-									id_barang: res.data.data.id,
-									jumlah:
-										parseInt(formData.jml_layak_pakai) +
-										parseInt(
-											formData.jml_tidak_layak_pakai
-										),
-								};
-								return newState;
-							});
-						} else {
-							setPenempatanDataPayload(() => {
-								const newState = {
-									id_lemari: penempatanData.id_lemari,
-									id_barang: res.data.data.id,
-									jumlah:
-										parseInt(formData.jml_layak_pakai) +
-										parseInt(
-											formData.jml_tidak_layak_pakai
-										),
-								};
-								return newState;
-							});
-						}
-					})
-					.catch((err) => {
-						console.log(err);
-					});
-			}
+			// Master
 		}
+		// if (param === "ruangan") {
+		// 	if (idRB && (location.pathname.includes('/edit/') || param === 'barang')) {
+		// 		// Edit Ruangan
+		// 		await editDataRuangan(id, formData)
+		// 			.then(() => {
+		// 				setRuangan((prevState) => {
+		// 					const updatedRuangan = prevState.map((item) => {
+		// 						if (item.id === id) {
+		// 							return {
+		// 								...item,
+		// 								name: formData.name,
+		// 							};
+		// 						}
+		// 						return item;
+		// 					});
+		// 					return updatedRuangan;
+		// 				});
+		// 				if (param === "ruanganBarang") {
+		// 					navigate(`/ruangan/${idRuangan}`);
+		// 					window.location.reload();
+		// 				} else if (param === "jurusanBarang") {
+		// 					navigate(`/jurusan/${idJurusan}/${idLemari}`);
+		// 					window.location.reload();
+		// 				} else {
+		// 					navigate(`/master/${param}`);
+		// 					window.location.reload();
+		// 				}
+		// 			})
+		// 			.catch((err) => {
+		// 				console.log(err);
+		// 			});
+		// 	} else {
+		// 		// Create Ruangan
+		// 		await addDataRuangan(formData)
+		// 			.then((res) => {
+		// 				setRuangan((prevState) => [
+		// 					...prevState,
+		// 					res.data.data,
+		// 				]);
+		// 				if (param === "ruanganBarang") {
+		// 					navigate(`/ruangan/${idRuangan}`);
+		// 					window.location.reload();
+		// 				} else if (param === "jurusanBarang") {
+		// 					navigate(`/jurusan/${idJurusan}/${idLemari}`);
+		// 					window.location.reload();
+		// 				} else {
+		// 					navigate(`/master/${param}`);
+		// 					window.location.reload();
+		// 				}
+		// 			})
+		// 			.catch((err) => {
+		// 				console.log(err);
+		// 			});
+		// 	}
+		// } else {
+		// 	if (idRB && (location.pathname.includes('/edit/') || param === 'barang')) {
+		// 		// Edit Barang
+		// 		await editDataBarang(idRB, formData)
+		// 			.then(() => {
+		// 				if (penempatan === "ruangan") {
+		// 					setPenempatanDataPayload(() => {
+		// 						const newState = {
+		// 							id_ruangan: penempatanData.id_ruangan,
+		// 							id_barang: formData.id,
+		// 							jumlah:
+		// 								parseInt(formData.jml_layak_pakai) +
+		// 								parseInt(
+		// 									formData.jml_tidak_layak_pakai
+		// 								),
+		// 						};
+		// 						console.log(newState);
+		// 						return newState;
+		// 					});
+		// 				} else {
+		// 					setPenempatanDataPayload(() => {
+		// 						const newState = {
+		// 							id_lemari: penempatanData.id_lemari,
+		// 							id_barang: formData.id,
+		// 							jumlah:
+		// 								parseInt(formData.jml_layak_pakai) +
+		// 								parseInt(
+		// 									formData.jml_tidak_layak_pakai
+		// 								),
+		// 						};
+		// 						console.log(newState);
+		// 						return newState;
+		// 					});
+		// 				}
+		// 			})
+		// 			.catch((err) => {
+		// 				console.log(err);
+		// 			});
+		// 	} else {
+		// 		// Create Barang
+		// 		await addDataBarang(formData)
+		// 			.then(async (res) => {
+		// 				setPenempatanDataPayload(() => {
+		// 					const newState = {
+		// 						id_lemari: penempatanData.id_lemari,
+		// 						id_ruangan: penempatanData.id_ruangan,
+		// 						id_barang: res.data.data.id,
+		// 						jumlah:
+		// 							parseInt(formData.jml_layak_pakai) +
+		// 							parseInt(
+		// 								formData.jml_tidak_layak_pakai
+		// 							),
+		// 					};
+		// 					return newState;
+		// 				});
+		// 				if (penempatan === "ruangan") {
+		// 					setPenempatanDataPayload(() => {
+		// 						const newState = {
+		// 							id_ruangan:
+		// 								param === "ruanganBarang"
+		// 									? idRuangan
+		// 									: penempatanData.id_ruangan,
+		// 							id_barang: res.data.data.id,
+		// 							jumlah:
+		// 								parseInt(formData.jml_layak_pakai) +
+		// 								parseInt(
+		// 									formData.jml_tidak_layak_pakai
+		// 								),
+		// 						};
+		// 						return newState;
+		// 					});
+		// 				} else {
+		// 					setPenempatanDataPayload(() => {
+		// 						const newState = {
+		// 							id_lemari: penempatanData.id_lemari,
+		// 							id_barang: res.data.data.id,
+		// 							jumlah:
+		// 								parseInt(formData.jml_layak_pakai) +
+		// 								parseInt(
+		// 									formData.jml_tidak_layak_pakai
+		// 								),
+		// 						};
+		// 						return newState;
+		// 					});
+		// 				}
+		// 			})
+		// 			.catch((err) => {
+		// 				console.log(err);
+		// 			});
+		// 	}
+		// }
 	};
 
 	function formatString(str) {
@@ -422,7 +321,7 @@ export default function FormPage() {
 
 	return loading ? (
 		<h1>Loading...</h1>
-	) : idRB && (location.pathname.includes('/edit/') || param === 'barang') ? ( // If id exists, Edit Barang
+	) : (location.pathname.includes("/edit/")) ? ( // If id exists, Edit Barang
 		<div className="content-wrapper">
 			<section className="content-header">
 				<div className="container-fluid">
@@ -578,126 +477,70 @@ export default function FormPage() {
 										<div className="form-floating mb-3">
 											<select
 												className="form-select"
-												name="penempatan"
-												id="inputPenempatan"
-												value={penempatan} // kesini
-												readOnly>
-												{penempatan === "ruangan" ? (
-													<option value={"ruangan"}>
-														Ruangan
-													</option>
-												) : (
-													<option value={"lemari"}>
-														Lemari
-													</option>
-												)}
+												name="id_ruangan"
+												id="inputIdRuangan"
+												value={
+													penempatanData.id_ruangan
+												}
+												onChange={(e) => {
+													setPenempatanData({
+														...penempatanData,
+														id_ruangan:
+															e.target.value,
+													});
+												}}>
+												<option value={-1} disabled>
+													Pilih Ruangan
+												</option>
+												{ruangan.map((item) => {
+													return (
+														<option
+															key={item.id}
+															value={item.id}>
+															{item.nama_ruangan}
+														</option>
+													);
+												})}
 											</select>
-											<label htmlFor="inputPenempatan">
-												Penempatan Barang
+											<label htmlFor="inputIdRuangan">
+												Ruangan
 											</label>
 										</div>
 										<div className="form-floating mb-3">
-											{penempatan === "ruangan" ? (
-												<>
-													<select
-														className="form-select"
-														name="id_ruangan"
-														id="inputIdRuangan"
-														value={
-															penempatanData.id_ruangan
-														}
-														onChange={(e) => {
-															console.log(
-																e.target.value
-															);
-															setPenempatanData({
-																...penempatanData,
-																id_ruangan:
-																	e.target
-																		.value,
-															});
-														}}>
-														<option
-															value={-1}
-															disabled>
-															Pilih Ruangan
-														</option>
-														{ruangan.map((item) => {
+											<select
+												className="form-select"
+												name="id_lemari"
+												id="inputIdLemari"
+												value={penempatanData.id_lemari}
+												onChange={(e) => {
+													setPenempatanData({
+														...penempatanData,
+														id_lemari:
+															e.target.value,
+													});
+												}}>
+												<option value={-1} disabled>
+													Pilih Lemari
+												</option>
+												<option value='null'>
+													Tidak disimpan di lemari
+												</option>
+												{
+													lemari.map(item => {
+														if (item.id_ruangan === penempatanData.id_ruangan) {
 															return (
-																<option
-																	key={
-																		item.id
-																	}
-																	value={
-																		item.id
-																	}>
-																	{
-																		item.nama_ruangan
-																	}
+																<option key={item.id} value={item.id}>
+																	{item.no_lemari}
 																</option>
-															);
-														})}
-													</select>
-													<label htmlFor="inputIdRuangan">
-														Ruangan
-													</label>
-												</>
-											) : (
-												<>
-													<select
-														className="form-select"
-														name="id_lemari"
-														id="inputIdLemari"
-														value={
-															penempatanData.id_lemari
+															)
 														}
-														onChange={(e) => {
-															console.log(
-																e.target.value
-															);
-															setPenempatanData({
-																...penempatanData,
-																id_lemari:
-																	e.target
-																		.value,
-															});
-														}}>
-														<option
-															value={-1}
-															disabled>
-															Pilih Lemari
-														</option>
-														{lemari.map((item) => {
-															const namaJurusan =
-																jurusan.find(
-																	(jur) =>
-																		jur.id ==
-																		item.id_jurusan
-																).jurusan;
-															return (
-																<option
-																	key={
-																		item.id
-																	}
-																	value={
-																		item.id
-																	}>
-																	{
-																		item.no_lemari
-																	}{" "}
-																	-{" "}
-																	{
-																		namaJurusan
-																	}
-																</option>
-															);
-														})}
-													</select>
-													<label htmlFor="inputIdLemari">
-														Lemari
-													</label>
-												</>
-											)}
+														return null;
+													})
+												}
+											</select>
+											<label htmlFor="inputIdLemari">
+												Lemari
+											</label>
 										</div>
 										<div className="form-floating mb-3">
 											<input
@@ -992,46 +835,8 @@ export default function FormPage() {
 												Spesifikasi
 											</label>
 										</div>
-										<div className="form-floating mb-3">
-											{param !== "ruanganBarang" &&
-												param !== "jurusanBarang" && (
-													<>
-														<select
-															className="form-select"
-															name="penempatan"
-															id="inputPenempatan"
-															value={penempatan}
-															onChange={(e) =>
-																setPenempatan(
-																	e.target
-																		.value
-																)
-															}>
-															<option
-																value={""}
-																disabled>
-																Pilih Penempatan
-															</option>
-															<option
-																value={
-																	"ruangan"
-																}>
-																Ruangan
-															</option>
-															<option
-																value={
-																	"lemari"
-																}>
-																Lemari
-															</option>
-														</select>
-														<label htmlFor="inputPenempatan">
-															Penempatan Barang
-														</label>
-													</>
-												)}
-										</div>
-										{param === "ruanganBarang" && (
+										{/* Non-Master */}
+										{param === "ruanganBarang" ? (
 											<>
 												<div className="form-floating mb-3">
 													<input
@@ -1048,161 +853,118 @@ export default function FormPage() {
 													</label>
 												</div>
 											</>
-										)}
-										{param !== "ruanganBarang" &&
-											penempatan && (
+										) : param === "lemariBarang" ? (
+											<>
 												<div className="form-floating mb-3">
-													{penempatan ===
-													"ruangan" ? (
-														<>
-															<select
-																className="form-select"
-																name="id_ruangan"
-																id="inputIdRuangan"
-																value={
-																	penempatanData.id_ruangan
+													<input
+														className="form-control"
+														type="number"
+														name="id_ruangan"
+														id="inputIdRuangan"
+														placeholder="ID Ruangan"
+														value={idRuangan}
+														readOnly
+													/>
+													<label htmlFor="inputIdRuangan">
+														ID Ruangan
+													</label>
+												</div>
+												<div className="form-floating mb-3">
+													<input
+														className="form-control"
+														type="number"
+														name="id_lemari"
+														id="inputIdLemari"
+														placeholder="ID Lemari"
+														value={idLemari}
+														readOnly
+													/>
+													<label htmlFor="inputIdLemari">
+														ID Lemari
+													</label>
+												</div>
+											</>
+										) : (
+											<div className="form-floating mb-3">
+												<select
+													className="form-select"
+													name="id_ruangan"
+													id="inputIdRuangan"
+													value={
+														penempatanData.id_ruangan
+													}
+													onChange={(e) =>
+														setPenempatanData({
+															...penempatanData,
+															id_ruangan:
+																e.target.value,
+														})
+													}>
+													<option value={-1} disabled>
+														Pilih Ruangan
+													</option>
+													{ruangan.map((item) => {
+														return (
+															<option
+																key={item.id}
+																value={item.id}>
+																{
+																	item.nama_ruangan
 																}
-																onChange={(e) =>
-																	setPenempatanData(
-																		{
-																			...penempatanData,
-																			id_ruangan:
-																				e
-																					.target
-																					.value,
-																		}
-																	)
-																}>
-																<option
-																	value={-1}
-																	disabled>
-																	Pilih
-																	Ruangan
-																</option>
-																{ruangan.map(
-																	(item) => {
-																		return (
-																			<option
-																				key={
-																					item.id
-																				}
-																				value={
-																					item.id
-																				}>
-																				{
-																					item.nama_ruangan
-																				}
-																			</option>
-																		);
-																	}
-																)}
-															</select>
-															<label htmlFor="inputIdRuangan">
-																Ruangan
-															</label>
-														</>
-													) : (
-														<>
-															<select
-																className="form-select"
-																name="id_lemari"
-																id="inputIdLemari"
-																value={
-																	penempatanData.id_lemari
+															</option>
+														);
+													})}
+												</select>
+												<label htmlFor="inputIdRuangan">
+													Ruangan
+												</label>
+											</div>
+										)}
+										{!["ruanganBarang", "lemariBarang"].includes(param) &&
+											penempatanData.id_ruangan && (
+												<div className="form-floating mb-3">
+													<select
+														className="form-select"
+														name="id_lemari"
+														id="inputIdLemari"
+														value={
+															penempatanData.id_lemari
+														}
+														onChange={(e) =>
+															setPenempatanData(
+																{
+																	...penempatanData,
+																	id_lemari:
+																		e
+																			.target
+																			.value,
 																}
-																onChange={(e) =>
-																	setPenempatanData(
-																		{
-																			...penempatanData,
-																			id_lemari:
-																				e
-																					.target
-																					.value,
-																		}
+															)
+														}>
+														<option
+															value={-1}
+															disabled>
+															Pilih Lemari
+														</option>
+														<option value='null'>
+															Tidak disimpan di lemari
+														</option>
+														{
+															lemari.map(item => {
+																if (item.id_ruangan === penempatanData.id_ruangan) {
+																	return (
+																		<option key={item.id} value={item.id}>
+																			{item.no_lemari}
+																		</option>
 																	)
-																}>
-																<option
-																	value={-1}
-																	disabled>
-																	Pilih Lemari
-																</option>
-																{param ===
-																"jurusanBarang"
-																	? lemari.map(
-																			(
-																				item
-																			) => {
-																				const namaJurusan =
-																					jurusan.find(
-																						(
-																							jur
-																						) =>
-																							jur.id ==
-																							item.id_jurusan
-																					).jurusan;
-																				if (
-																					item.id_jurusan ==
-																					idJurusan
-																				) {
-																					return (
-																						<option
-																							key={
-																								item.id
-																							}
-																							value={
-																								item.id
-																							}>
-																							Lemari{" "}
-																							{
-																								item.no_lemari
-																							}{" "}
-																							-{" "}
-																							{
-																								namaJurusan
-																							}
-																						</option>
-																					);
-																				}
-																				return null;
-																			}
-																	  )
-																	: lemari.map(
-																			(
-																				item
-																			) => {
-																				const namaJurusan =
-																					jurusan.find(
-																						(
-																							jur
-																						) =>
-																							jur.id ==
-																							item.id_jurusan
-																					).jurusan;
-																				return (
-																					<option
-																						key={
-																							item.id
-																						}
-																						value={
-																							item.id
-																						}>
-																						{
-																							item.no_lemari
-																						}{" "}
-																						-{" "}
-																						{
-																							namaJurusan
-																						}
-																					</option>
-																				);
-																			}
-																	  )}
-															</select>
-															<label htmlFor="inputIdLemari">
-																Lemari
-															</label>
-														</>
-													)}
+																}
+																return null;
+															})
+														}
+													</select>
+													<label htmlFor="inputIdLemari">
+														Lemari
+													</label>
 												</div>
 											)}
 										<div className="form-floating mb-3">

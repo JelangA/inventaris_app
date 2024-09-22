@@ -16,7 +16,7 @@ module.exports = {
         unique: true
       },
       luas_ruangan: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING,
         allowNull: false
       },
       inventaris_sapras: {

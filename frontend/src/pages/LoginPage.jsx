@@ -16,12 +16,14 @@ export default function LoginPage() {
 	const navigate = useNavigate();
 
 	useEffect(() => {
-		axiosClient.get('/profile').then(res => {
-			const newUser = res.data.data;
-			setUser(newUser);
-		}).catch(err => {
-			console.log(err);
-		});
+		if (ruangan.length > 0 && jurusan.length > 0) {
+			axiosClient.get('/profile').then(res => {
+				const newUser = res.data.data;
+				setUser(newUser);
+			}).catch(err => {
+				console.log(err);
+			});
+		}
 	}, [ruangan, jurusan]);
 
 	useEffect(() => {

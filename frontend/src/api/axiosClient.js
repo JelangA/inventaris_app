@@ -5,7 +5,7 @@ const axiosClient = axios.create({
 });
 
 axiosClient.interceptors.request.use((config) => {
-    if (!config.url.includes('/register') && !config.url.includes('/login')) {
+    if (!config.url.includes('/register') && !config.url.includes('/login') && config.url !== '/jurusan') {
         const token = sessionStorage.getItem('token');
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
