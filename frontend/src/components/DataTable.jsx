@@ -943,7 +943,7 @@ const DataTable = ({
 				renderTopToolbarCustomActions: ({ table }) => (
 					<Box sx={{ display: "flex", gap: "1rem" }}>
 						{type !== "user" &&
-							["admin", "kep_jurusan", "kep_bengkel"].includes(
+							["admin", "kep_jurusan", "kep_bengkel", "staf_tu"].includes(
 								role
 							) && (
 								<Button
@@ -1022,7 +1022,7 @@ const DataTable = ({
 				renderTopToolbarCustomActions: ({ table }) => (
 					<Box sx={{ display: "flex", gap: "1rem" }}>
 						{type !== "user" &&
-							["admin", "kep_jurusan", "kep_bengkel"].includes(
+							["admin", "kep_jurusan", "kep_bengkel", "staf_tu"].includes(
 								role
 							) && (
 								<Button

@@ -9,7 +9,6 @@ export default function AddPengadaanPage() {
 		tipe_pengadaan: "default",
 	});
 	const [barang, setBarang] = useState([]);
-	const [pengadaan, setPengadaan] = useState([]);
 	const navigate = useNavigate();
 
 	useEffect(() => {
@@ -18,13 +17,7 @@ export default function AddPengadaanPage() {
 				setBarang(res);
 			});
 		};
-		const fetchDataPengadaan = async () => {
-			await getDataPengadaan().then((res) => {
-				setPengadaan(res);
-			});
-		};
 		fetchDataBarang();
-		// fetchDataPengadaan();
 	}, []);
 
 	const onSubmit = (e) => {

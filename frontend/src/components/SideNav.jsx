@@ -195,127 +195,245 @@ const SideNav = () => {
 									</ul>
 								</li>
 							)}
-							<li className="nav-item">
-								<a href="#" className="nav-link">
-									<i className="nav-icon fas fa-school" />
-									<p>
-										Jurusan{" "}
-										<i className="fas fa-angle-left right" />
-									</p>
-								</a>
-								<ul className="nav nav-treeview">
-									{jurusan.map((item) => {
-										if (
-											user.tipe_user === "kep_jurusan" &&
-											user.id_jurusan === item.id
-										) {
-											return (
-												<li
-													key={item.id}
-													className="nav-item">
-													<a
-														href="#"
-														className="nav-link">
-														<i className="nav-icon far fa-circle" />
-														<p>
-															{item.jurusan}
-															<i className="fas fa-angle-left right" />
-														</p>
-													</a>
-													<ul className="nav-treeview">
-														{ruangan.map((r) => {
-															if (
-																r.id_jurusan ==
-																item.id
-															) {
-																const idRuangan =
-																	r.id;
-																return (
-																	<li
-																		key={
-																			r.id
-																		}
-																		className="nav-item pl-4">
-																		<Link
-																			to={`/ruangan/${idRuangan}`}
-																			className={`nav-link ${
-																				location.pathname.includes(
-																					`${idRuangan}`
-																				)
-																					? "active"
-																					: ""
-																			}`}>
-																			<p>
-																				Ruangan{" "}
-																				{
-																					r.nama_ruangan
+							{user.tipe_user === "staf_tu" &&
+								jurusan.map((item) => {
+									if (
+										(user.tipe_user === "kep_jurusan" ||
+											user.tipe_user === "staf_tu") &&
+										user.id_jurusan === item.id
+									) {
+										return (
+											<li
+												key={item.id}
+												className="nav-item">
+												<a
+													href="#"
+													className="nav-link">
+													<i className="nav-icon fas fa-school" />
+													<p>
+														{item.jurusan}
+														<i className="fas fa-angle-left right" />
+													</p>
+												</a>
+												<ul className="nav-treeview">
+													{ruangan.map((r) => {
+														if (
+															r.id_jurusan ==
+															item.id
+														) {
+															const idRuangan =
+																r.id;
+															return (
+																<li
+																	key={r.id}
+																	className="nav-item pl-4">
+																	<Link
+																		to={`/ruangan/${idRuangan}`}
+																		className={`nav-link ${
+																			location.pathname.includes(
+																				`${idRuangan}`
+																			)
+																				? "active"
+																				: ""
+																		}`}>
+																		<p>
+																			Ruangan{" "}
+																			{
+																				r.nama_ruangan
+																			}
+																		</p>
+																	</Link>
+																</li>
+															);
+														}
+													})}
+												</ul>
+											</li>
+										);
+									} else if (user.tipe_user === "admin") {
+										return (
+											<li
+												key={item.id}
+												className="nav-item">
+												<a
+													href="#"
+													className="nav-link">
+													<i className="nav-icon far fa-circle" />
+													<p>
+														{item.jurusan}
+														<i className="fas fa-angle-left right" />
+													</p>
+												</a>
+												<ul className="nav-treeview">
+													{ruangan.map((r) => {
+														if (
+															r.id_jurusan ==
+															item.id
+														) {
+															const idRuangan =
+																r.id;
+															return (
+																<li
+																	key={r.id}
+																	className="nav-item pl-4">
+																	<Link
+																		to={`/ruangan/${idRuangan}`}
+																		className={`nav-link ${
+																			location.pathname.includes(
+																				`${idRuangan}`
+																			)
+																				? "active"
+																				: ""
+																		}`}>
+																		<p>
+																			Ruangan{" "}
+																			{
+																				r.nama_ruangan
+																			}
+																		</p>
+																	</Link>
+																</li>
+															);
+														}
+													})}
+												</ul>
+											</li>
+										);
+									} else {
+										return null;
+									}
+								})}
+							{user.tipe_user !== "staf_tu" && (
+								<li className="nav-item">
+									<a href="#" className="nav-link">
+										<i className="nav-icon fas fa-school" />
+										<p>
+											Jurusan{" "}
+											<i className="fas fa-angle-left right" />
+										</p>
+									</a>
+									<ul className="nav nav-treeview">
+										{jurusan.map((item) => {
+											if (
+												user.tipe_user ===
+													"kep_jurusan" &&
+												user.id_jurusan === item.id
+											) {
+												return (
+													<li
+														key={item.id}
+														className="nav-item">
+														<a
+															href="#"
+															className="nav-link">
+															<i className="nav-icon far fa-circle" />
+															<p>
+																{item.jurusan}
+																<i className="fas fa-angle-left right" />
+															</p>
+														</a>
+														<ul className="nav-treeview">
+															{ruangan.map(
+																(r) => {
+																	if (
+																		r.id_jurusan ==
+																		item.id
+																	) {
+																		const idRuangan =
+																			r.id;
+																		return (
+																			<li
+																				key={
+																					r.id
 																				}
-																			</p>
-																		</Link>
-																	</li>
-																);
-															}
-														})}
-													</ul>
-												</li>
-											);
-										} else if (user.tipe_user === "admin") {
-											return (
-												<li
-													key={item.id}
-													className="nav-item">
-													<a
-														href="#"
-														className="nav-link">
-														<i className="nav-icon far fa-circle" />
-														<p>
-															{item.jurusan}
-															<i className="fas fa-angle-left right" />
-														</p>
-													</a>
-													<ul className="nav-treeview">
-														{ruangan.map((r) => {
-															if (
-																r.id_jurusan ==
-																item.id
-															) {
-																const idRuangan =
-																	r.id;
-																return (
-																	<li
-																		key={
-																			r.id
-																		}
-																		className="nav-item pl-4">
-																		<Link
-																			to={`/ruangan/${idRuangan}`}
-																			className={`nav-link ${
-																				location.pathname.includes(
-																					`${idRuangan}`
-																				)
-																					? "active"
-																					: ""
-																			}`}>
-																			<p>
-																				Ruangan{" "}
-																				{
-																					r.nama_ruangan
+																				className="nav-item pl-4">
+																				<Link
+																					to={`/ruangan/${idRuangan}`}
+																					className={`nav-link ${
+																						location.pathname.includes(
+																							`${idRuangan}`
+																						)
+																							? "active"
+																							: ""
+																					}`}>
+																					<p>
+																						Ruangan{" "}
+																						{
+																							r.nama_ruangan
+																						}
+																					</p>
+																				</Link>
+																			</li>
+																		);
+																	}
+																}
+															)}
+														</ul>
+													</li>
+												);
+											} else if (
+												user.tipe_user === "admin"
+											) {
+												return (
+													<li
+														key={item.id}
+														className="nav-item">
+														<a
+															href="#"
+															className="nav-link">
+															<i className="nav-icon far fa-circle" />
+															<p>
+																{item.jurusan}
+																<i className="fas fa-angle-left right" />
+															</p>
+														</a>
+														<ul className="nav-treeview">
+															{ruangan.map(
+																(r) => {
+																	if (
+																		r.id_jurusan ==
+																		item.id
+																	) {
+																		const idRuangan =
+																			r.id;
+																		return (
+																			<li
+																				key={
+																					r.id
 																				}
-																			</p>
-																		</Link>
-																	</li>
-																);
-															}
-														})}
-													</ul>
-												</li>
-											);
-										} else {
-											return null;
-										}
-									})}
-								</ul>
-							</li>
+																				className="nav-item pl-4">
+																				<Link
+																					to={`/ruangan/${idRuangan}`}
+																					className={`nav-link ${
+																						location.pathname.includes(
+																							`${idRuangan}`
+																						)
+																							? "active"
+																							: ""
+																					}`}>
+																					<p>
+																						Ruangan{" "}
+																						{
+																							r.nama_ruangan
+																						}
+																					</p>
+																				</Link>
+																			</li>
+																		);
+																	}
+																}
+															)}
+														</ul>
+													</li>
+												);
+											} else {
+												return null;
+											}
+										})}
+									</ul>
+								</li>
+							)}
+
 							<li className="nav-item">
 								<Link
 									to="/pengadaan"
