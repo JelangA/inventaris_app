@@ -39,7 +39,7 @@ controller.register = async (req, res) => {
 
     try {
         // Validasi input
-        if (!name || !username || !password || !tipe_user || !id_jurusan) {
+        if (!name || !username || !password || !tipe_user) {
             return respon.responseErr(res, 'Semua field harus diisi', 400);
         }
 
