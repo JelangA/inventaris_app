@@ -60,7 +60,7 @@ const routes = createBrowserRouter([
             {
                 path:'/ruangan/:id',
                 element: (
-                    <ProtectedRoute allowedRoles={['admin', 'kep_jurusan']}>
+                    <ProtectedRoute allowedRoles={['admin', 'kep_jurusan', 'staf_tu']}>
                         <RuanganPage />
                     </ProtectedRoute>
                 )
