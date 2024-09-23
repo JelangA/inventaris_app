@@ -70,6 +70,7 @@ const DataTable = ({
 	} = useStateContext();
 	const [penempatanBarang, setPenempatanBarang] = useState([]);
 	const [penempatanLemari, setPenempatanLemari] = useState([]);
+	const [penempatanRuangan, setPenempatanRuangan] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const navigate = useNavigate();
 
@@ -92,7 +93,10 @@ const DataTable = ({
 
 	useEffect(() => {
 		if (type === "lemari") {
-				setPenempatanLemari(data);
+			setPenempatanLemari(data);
+		}
+		if (type === "ruangan") {
+			setPenempatanRuangan(data);
 		}
 	}, [data]);
 
@@ -341,7 +345,7 @@ const DataTable = ({
 			accessorKey: "inventaris_sapras",
 			header: "Inventaris Sapras",
 			muiEditTextFieldProps: {
-				required: true,
+				required: false,
 				error: !!validationErrors?.inventaris_sapras,
 				helperText: validationErrors?.inventaris_sapras,
 				onFocus: () =>
@@ -349,6 +353,43 @@ const DataTable = ({
 						...validationErrors,
 						inventaris_sapras: undefined,
 					}),
+			},
+		},
+		{
+			accessorKey: "id_jurusan",
+			id: "id_jurusan",
+			header: "Jurusan",
+			enableEditing: true,
+			muiEditTextFieldProps: {
+				select: true,
+				required: true,
+				error: !!validationErrors?.id_jurusan,
+				helperText: validationErrors?.id_jurusan,
+				onFocus: () =>
+					setValidationErrors({
+						...validationErrors,
+						id_jurusan: undefined,
+					}),
+				children: [
+					<MenuItem  value="Tidak ada di jurusan" key="none">
+						Tidak ada di jurusan
+					</MenuItem>,
+					...jurusan.map((j) => (
+						<MenuItem key={j.id} value={j.id}>
+							{j.jurusan}
+						</MenuItem>
+					)),
+				],
+			},
+			Cell: ({ cell }) => {
+				const penempatan = penempatanRuangan.find(
+					(p) => p.id == cell.row.original.id
+				);
+
+				if (penempatan && jurusan.find((j) => j.id == penempatan.id_jurusan)) {
+					return jurusan.find((j) => j.id == penempatan.id_jurusan).jurusan;
+				}
+				return "Ruangan";
 			},
 		},
 	];
@@ -552,7 +593,11 @@ const DataTable = ({
 		{
 			accessorKey: "tanggal",
 			header: "Tanggal",
-			enableEditing: true,
+			Cell: ({ cell }) => {
+				if (cell.getValue()) {
+					return cell.getValue().split("T")[0];
+				}
+			},
 			muiEditTextFieldProps: {
 				required: true,
 				error: !!validationErrors?.tanggal,
