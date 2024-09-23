@@ -244,6 +244,20 @@ const DataTable = ({
 			},
 		},
 		{
+			accessorKey: "jumlah_total",
+			header: "Jumlah Total",
+			muiEditTextFieldProps: {
+				required: true,
+				error: !!validationErrors?.jumlah_total,
+				helperText: validationErrors?.jumlah_total,
+				onFocus: () =>
+					setValidationErrors({
+						...validationErrors,
+						jumlah_total: undefined,
+					}),
+			},
+		},
+		{
 			accessorKey: "sumber",
 			header: "Sumber",
 			muiEditTextFieldProps: {
