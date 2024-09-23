@@ -34,7 +34,8 @@ export const ContextProvider = ({ children }) => {
                 name: user.name,
                 username: user.username,
                 tipe_user: user.tipe_user,
-                no_hp: user.no_hp
+                no_hp: user.no_hp,
+                id_jurusan: user.id_jurusan
             }
             sessionStorage.setItem('user', JSON.stringify(User));
         } else {
