@@ -111,6 +111,7 @@ export default function RegisterPage() {
 	const onSubmit = (e) => {
 		e.preventDefault();
 		if (validateForm()) {
+			console.log(formData.tipe_user === 'staf_tu' && formData.id_jurusan === 0)
 			const payload = {
 				username: formData.username,
 				name: formData.name,
@@ -119,6 +120,11 @@ export default function RegisterPage() {
 				id_jurusan: formData.id_jurusan,
 				password: formData.password,
 			};
+			if (payload.tipe_user === 'staf_tu' && (payload.id_jurusan === 0 || payload.id_jurusan === null || payload.id_jurusan === undefined)) {
+				console.log('masuak')
+				payload.id_jurusan = 1;	
+			}
+			console.log
 			axiosClient
 				.post("/register", payload)
 				.then((res) => {
@@ -130,7 +136,7 @@ export default function RegisterPage() {
 					setErrors({
 						login:
 							err.response?.data?.message ||
-							"Login gagal, periksa kredensial Anda.",
+							"Register gagal, periksa kredensial Anda.",
 					});
 				});
 		}

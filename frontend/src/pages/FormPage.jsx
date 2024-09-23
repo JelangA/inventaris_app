@@ -139,9 +139,22 @@ export default function FormPage() {
 	const onSubmit = async (e) => {
 		e.preventDefault();
 		console.log(formData);
+		if (
+			Object.values(formData).some(
+				(value) =>
+					value === null || value === undefined || value === ""
+			)
+		) {
+			alert("Tolong isi semua field.");
+			return;
+		}
 		if (["ruanganBarang", "lemariBarang"].includes(param)) {
 			if (location.pathname.includes("/edit/")) {
-				await editDataBarang(idRB, formData).then(() => {
+				await editDataBarang(idRB, formData).then((res) => {
+					if (!res) {
+						alert("No Inventaris sudah terdaftar");
+						return;
+					}
 					setPenempatanDataPayload(() => {
 						const newState = {
 							id_ruangan: penempatanData.id_ruangan,
@@ -160,6 +173,10 @@ export default function FormPage() {
 				});
 			} else if (location.pathname.includes("/add/")) {
 				await addDataBarang(formData).then((res) => {
+					if (!res) {
+						alert("No Inventaris sudah terdaftar");
+						return;
+					}
 					setBarang([...barang, res]); // update barang state
 					setPenempatanDataPayload(() => {
 						const newState = {
@@ -178,7 +195,11 @@ export default function FormPage() {
 			// Master
 			if (idRB) {
 				// Edit Barang
-				await editDataBarang(idRB, formData).then(() => {
+				await editDataBarang(idRB, formData).then((res) => {
+					if (!res) {
+						alert("No Inventaris sudah terdaftar");
+						return;
+					}
 					setPenempatanDataPayload(() => {
 						const newState = {
 							id_ruangan: penempatanData.id_ruangan,
@@ -198,6 +219,10 @@ export default function FormPage() {
 			} else {
 				// Create Barang
 				await addDataBarang(formData).then((res) => {
+					if (!res) {
+						alert("No Inventaris sudah terdaftar");
+						return;
+					}
 					setBarang([...barang, res]); // update barang state
 					setPenempatanDataPayload(() => {
 						const newState = {
@@ -213,154 +238,9 @@ export default function FormPage() {
 						};
 						return newState;
 					});
-				});
+				})
 			}
 		}
-		// if (param === "ruangan") {
-		// 	if (idRB && (location.pathname.includes('/edit/') || param === 'barang')) {
-		// 		// Edit Ruangan
-		// 		await editDataRuangan(id, formData)
-		// 			.then(() => {
-		// 				setRuangan((prevState) => {
-		// 					const updatedRuangan = prevState.map((item) => {
-		// 						if (item.id === id) {
-		// 							return {
-		// 								...item,
-		// 								name: formData.name,
-		// 							};
-		// 						}
-		// 						return item;
-		// 					});
-		// 					return updatedRuangan;
-		// 				});
-		// 				if (param === "ruanganBarang") {
-		// 					navigate(`/ruangan/${idRuangan}`);
-		// 					window.location.reload();
-		// 				} else if (param === "jurusanBarang") {
-		// 					navigate(`/jurusan/${idJurusan}/${idLemari}`);
-		// 					window.location.reload();
-		// 				} else {
-		// 					navigate(`/master/${param}`);
-		// 					window.location.reload();
-		// 				}
-		// 			})
-		// 			.catch((err) => {
-		// 				console.log(err);
-		// 			});
-		// 	} else {
-		// 		// Create Ruangan
-		// 		await addDataRuangan(formData)
-		// 			.then((res) => {
-		// 				setRuangan((prevState) => [
-		// 					...prevState,
-		// 					res.data.data,
-		// 				]);
-		// 				if (param === "ruanganBarang") {
-		// 					navigate(`/ruangan/${idRuangan}`);
-		// 					window.location.reload();
-		// 				} else if (param === "jurusanBarang") {
-		// 					navigate(`/jurusan/${idJurusan}/${idLemari}`);
-		// 					window.location.reload();
-		// 				} else {
-		// 					navigate(`/master/${param}`);
-		// 					window.location.reload();
-		// 				}
-		// 			})
-		// 			.catch((err) => {
-		// 				console.log(err);
-		// 			});
-		// 	}
-		// } else {
-		// 	if (idRB && (location.pathname.includes('/edit/') || param === 'barang')) {
-		// 		// Edit Barang
-		// 		await editDataBarang(idRB, formData)
-		// 			.then(() => {
-		// 				if (penempatan === "ruangan") {
-		// 					setPenempatanDataPayload(() => {
-		// 						const newState = {
-		// 							id_ruangan: penempatanData.id_ruangan,
-		// 							id_barang: formData.id,
-		// 							jumlah:
-		// 								parseInt(formData.jml_layak_pakai) +
-		// 								parseInt(
-		// 									formData.jml_tidak_layak_pakai
-		// 								),
-		// 						};
-		// 						console.log(newState);
-		// 						return newState;
-		// 					});
-		// 				} else {
-		// 					setPenempatanDataPayload(() => {
-		// 						const newState = {
-		// 							id_lemari: penempatanData.id_lemari,
-		// 							id_barang: formData.id,
-		// 							jumlah:
-		// 								parseInt(formData.jml_layak_pakai) +
-		// 								parseInt(
-		// 									formData.jml_tidak_layak_pakai
-		// 								),
-		// 						};
-		// 						console.log(newState);
-		// 						return newState;
-		// 					});
-		// 				}
-		// 			})
-		// 			.catch((err) => {
-		// 				console.log(err);
-		// 			});
-		// 	} else {
-		// 		// Create Barang
-		// 		await addDataBarang(formData)
-		// 			.then(async (res) => {
-		// 				setPenempatanDataPayload(() => {
-		// 					const newState = {
-		// 						id_lemari: penempatanData.id_lemari,
-		// 						id_ruangan: penempatanData.id_ruangan,
-		// 						id_barang: res.data.data.id,
-		// 						jumlah:
-		// 							parseInt(formData.jml_layak_pakai) +
-		// 							parseInt(
-		// 								formData.jml_tidak_layak_pakai
-		// 							),
-		// 					};
-		// 					return newState;
-		// 				});
-		// 				if (penempatan === "ruangan") {
-		// 					setPenempatanDataPayload(() => {
-		// 						const newState = {
-		// 							id_ruangan:
-		// 								param === "ruanganBarang"
-		// 									? idRuangan
-		// 									: penempatanData.id_ruangan,
-		// 							id_barang: res.data.data.id,
-		// 							jumlah:
-		// 								parseInt(formData.jml_layak_pakai) +
-		// 								parseInt(
-		// 									formData.jml_tidak_layak_pakai
-		// 								),
-		// 						};
-		// 						return newState;
-		// 					});
-		// 				} else {
-		// 					setPenempatanDataPayload(() => {
-		// 						const newState = {
-		// 							id_lemari: penempatanData.id_lemari,
-		// 							id_barang: res.data.data.id,
-		// 							jumlah:
-		// 								parseInt(formData.jml_layak_pakai) +
-		// 								parseInt(
-		// 									formData.jml_tidak_layak_pakai
-		// 								),
-		// 						};
-		// 						return newState;
-		// 					});
-		// 				}
-		// 			})
-		// 			.catch((err) => {
-		// 				console.log(err);
-		// 			});
-		// 	}
-		// }
 	};
 
 	function formatString(str) {

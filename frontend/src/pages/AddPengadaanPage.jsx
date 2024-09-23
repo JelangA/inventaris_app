@@ -29,6 +29,11 @@ export default function AddPengadaanPage() {
 
 	const onSubmit = (e) => {
 		e.preventDefault();
+		console.log(formData);
+		if (Object.values(formData).some(value => value === null || value === undefined || value === 'default' || value === -1 || value === '')) {
+			alert("Tolong isi semua field");
+			return;
+		}
 		const barangDetail = barang.find(
 			(b) => b.no_inventaris == formData.no_inventaris
 		);
