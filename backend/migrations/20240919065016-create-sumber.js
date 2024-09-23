@@ -10,7 +10,8 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       sumber: {
-        type: Sequelize.INTEGER
+        type: Sequelize.STRING,
+        allowNull: false,
       },
     });
   },

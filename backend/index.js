@@ -28,7 +28,7 @@ app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }));
 app.use(express.json());
 app.use(fileUpload( { createParentPath: true } ));
 app.use(express.urlencoded({ extended: true }));
-app.use(limiter);
+// app.use(limiter);
 
 // Swagger route for API documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));

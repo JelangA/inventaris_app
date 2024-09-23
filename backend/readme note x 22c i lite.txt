@@ -11,7 +11,7 @@ Skeleton {
     npx sequelize-cli init
 }
 
-database migrations{
+database migrations-seed{
     add:
          npx sequelize db:migrate
          npx sequelize db:seed:all
