@@ -13,6 +13,7 @@ import {
 } from "../api/penempatanRApi.js";
 import { useStateContext } from "../contexts/ContextProvider.jsx";
 import { getDataLemari } from "../api/lemariApi";
+import { getDataSumber } from "../api/sumberApi";
 
 export default function FormPage() {
 	const { param, idRB, idJurusan, idRuangan, idLemari } = useParams();
@@ -31,6 +32,7 @@ export default function FormPage() {
 	const [loading, setLoading] = useState(true);
 	const [penempatanId, setPenempatanId] = useState(null); // id pada tabel penempatan_ruangan
 	const [penempatanDetail, setPenempatanDetail] = useState(null);
+	const [sumber, setSumber] = useState([]);
 
 	// Hanya digunakan saat edit barang
 	useEffect(() => {
@@ -62,21 +64,26 @@ export default function FormPage() {
 				setLemari(res);
 			});
 		};
+		const fetchSumberData = async () => {
+			await getDataSumber().then((res) => {
+				setSumber(res);
+			});
+		};
 		const fetchPenempatanRuangan = async () => {
 			await getDataPenempatanRuangan().then((res) => {
 				setPenempatanData({
 					id_ruangan: res.find((item) => item.id_barang == idRB)
 						.id_ruangan,
-					id_lemari: res.find((item) => item.id_barang == idRB).id_lemari
+					id_lemari: -1,
 				});
 				setPenempatanId(res.find((item) => item.id_barang == idRB).id);
 			});
 		};
 		const fetchData = async () => {
-			if (location.pathname.includes("/edit/")) {
+			if (idRB || location.pathname.includes("/edit/")) {
 				await fetchBarangDataById();
 				await fetchPenempatanRuangan();
-			} else if (location.pathname.includes("/add/")) {
+			} else if (!idRB || location.pathname.includes("/add/")) {
 				setFormData({
 					no_inventaris: null,
 					nama_barang: "",
@@ -86,11 +93,12 @@ export default function FormPage() {
 					satuan: "",
 					jml_layak_pakai: 0,
 					jml_tidak_layak_pakai: 0,
-					sumber: "",
+					sumber: -1,
 					pengadaan: null,
 				});
 			}
 			await fetchLemariData();
+			await fetchSumberData();
 			setLoading(false);
 		};
 		fetchData();
@@ -99,6 +107,7 @@ export default function FormPage() {
 	// Barang
 	useEffect(() => {
 		if (penempatanDataPayload) {
+			console.log(penempatanDataPayload);
 			if (location.pathname.includes("/edit/")) {
 				editDataPenempatanRuangan(
 					penempatanId,
@@ -110,6 +119,19 @@ export default function FormPage() {
 				addDataPenempatanRuangan(penempatanDataPayload).then(() => {
 					window.history.back();
 				});
+			} else {
+				if (idRB) {
+					editDataPenempatanRuangan(
+						penempatanId,
+						penempatanDataPayload
+					).then(() => {
+						window.history.back();
+					});
+				} else {
+					addDataPenempatanRuangan(penempatanDataPayload).then(() => {
+						window.history.back();
+					});
+				}
 			}
 		}
 	}, [penempatanDataPayload]);
@@ -123,13 +145,14 @@ export default function FormPage() {
 					setPenempatanDataPayload(() => {
 						const newState = {
 							id_ruangan: penempatanData.id_ruangan,
-							id_lemari: penempatanData.id_lemari == 'null' ? null : penempatanData.id_lemari,
+							id_lemari:
+								penempatanData.id_lemari == "null"
+									? null
+									: penempatanData.id_lemari,
 							id_barang: idRB,
 							jumlah:
 								parseInt(formData.jml_layak_pakai) +
-								parseInt(
-									formData.jml_tidak_layak_pakai
-								),
+								parseInt(formData.jml_tidak_layak_pakai),
 						};
 						console.log(newState);
 						return newState;
@@ -153,6 +176,45 @@ export default function FormPage() {
 			}
 		} else {
 			// Master
+			if (idRB) {
+				// Edit Barang
+				await editDataBarang(idRB, formData).then(() => {
+					setPenempatanDataPayload(() => {
+						const newState = {
+							id_ruangan: penempatanData.id_ruangan,
+							id_lemari:
+								penempatanData.id_lemari == "null"
+									? null
+									: penempatanData.id_lemari,
+							id_barang: idRB,
+							jumlah:
+								parseInt(formData.jml_layak_pakai) +
+								parseInt(formData.jml_tidak_layak_pakai),
+						};
+						console.log(newState);
+						return newState;
+					});
+				});
+			} else {
+				// Create Barang
+				await addDataBarang(formData).then((res) => {
+					setBarang([...barang, res]); // update barang state
+					setPenempatanDataPayload(() => {
+						const newState = {
+							id_ruangan: penempatanData.id_ruangan,
+							id_lemari:
+								penempatanData.id_lemari == "null"
+									? null
+									: penempatanData.id_lemari,
+							id_barang: res.data.data.id,
+							jumlah:
+								parseInt(formData.jml_layak_pakai) +
+								parseInt(formData.jml_tidak_layak_pakai),
+						};
+						return newState;
+					});
+				});
+			}
 		}
 		// if (param === "ruangan") {
 		// 	if (idRB && (location.pathname.includes('/edit/') || param === 'barang')) {
@@ -321,7 +383,7 @@ export default function FormPage() {
 
 	return loading ? (
 		<h1>Loading...</h1>
-	) : (location.pathname.includes("/edit/")) ? ( // If id exists, Edit Barang
+	) : location.pathname.includes("/edit/") ? ( // If id exists, Edit Barang
 		<div className="content-wrapper">
 			<section className="content-header">
 				<div className="container-fluid">
@@ -522,21 +584,24 @@ export default function FormPage() {
 												<option value={-1} disabled>
 													Pilih Lemari
 												</option>
-												<option value='null'>
+												<option value="null">
 													Tidak disimpan di lemari
 												</option>
-												{
-													lemari.map(item => {
-														if (item.id_ruangan === penempatanData.id_ruangan) {
-															return (
-																<option key={item.id} value={item.id}>
-																	{item.no_lemari}
-																</option>
-															)
-														}
-														return null;
-													})
-												}
+												{lemari.map((item) => {
+													if (
+														item.id_ruangan ===
+														penempatanData.id_ruangan
+													) {
+														return (
+															<option
+																key={item.id}
+																value={item.id}>
+																{item.no_lemari}
+															</option>
+														);
+													}
+													return null;
+												})}
 											</select>
 											<label htmlFor="inputIdLemari">
 												Lemari
@@ -616,8 +681,8 @@ export default function FormPage() {
 										<div className="row mb-3">
 											<div className="col-md-6">
 												<div className="form-floating mb-3 mb-md-0">
-													<input
-														className="form-control"
+													<select
+														className="form-select"
 														id="inputSumber"
 														type="text"
 														name="sumber"
@@ -629,8 +694,28 @@ export default function FormPage() {
 																sumber: e.target
 																	.value,
 															})
-														}
-													/>
+														}>
+														<option
+															value={-1}
+															disabled>
+															Pilih Sumber
+														</option>
+														{sumber.map((item) => {
+															return (
+																<option
+																	key={
+																		item.id
+																	}
+																	value={
+																		item.sumber
+																	}>
+																	{
+																		item.sumber
+																	}
+																</option>
+															);
+														})}
+													</select>
 													<label htmlFor="inputSumber">
 														Sumber
 													</label>
@@ -920,7 +1005,10 @@ export default function FormPage() {
 												</label>
 											</div>
 										)}
-										{!["ruanganBarang", "lemariBarang"].includes(param) &&
+										{![
+											"ruanganBarang",
+											"lemariBarang",
+										].includes(param) &&
 											penempatanData.id_ruangan && (
 												<div className="form-floating mb-3">
 													<select
@@ -931,36 +1019,43 @@ export default function FormPage() {
 															penempatanData.id_lemari
 														}
 														onChange={(e) =>
-															setPenempatanData(
-																{
-																	...penempatanData,
-																	id_lemari:
-																		e
-																			.target
-																			.value,
-																}
-															)
+															setPenempatanData({
+																...penempatanData,
+																id_lemari:
+																	e.target
+																		.value,
+															})
 														}>
 														<option
 															value={-1}
 															disabled>
 															Pilih Lemari
 														</option>
-														<option value='null'>
-															Tidak disimpan di lemari
+														<option value="null">
+															Tidak disimpan di
+															lemari
 														</option>
-														{
-															lemari.map(item => {
-																if (item.id_ruangan === penempatanData.id_ruangan) {
-																	return (
-																		<option key={item.id} value={item.id}>
-																			{item.no_lemari}
-																		</option>
-																	)
-																}
-																return null;
-															})
-														}
+														{lemari.map((item) => {
+															if (
+																item.id_ruangan ===
+																penempatanData.id_ruangan
+															) {
+																return (
+																	<option
+																		key={
+																			item.id
+																		}
+																		value={
+																			item.id
+																		}>
+																		{
+																			item.no_lemari
+																		}
+																	</option>
+																);
+															}
+															return null;
+														})}
 													</select>
 													<label htmlFor="inputIdLemari">
 														Lemari
@@ -1041,8 +1136,8 @@ export default function FormPage() {
 										<div className="row mb-3">
 											<div className="col-md-6">
 												<div className="form-floating mb-3 mb-md-0">
-													<input
-														className="form-control"
+													<select
+														className="form-select"
 														id="inputSumber"
 														type="text"
 														name="sumber"
@@ -1054,8 +1149,28 @@ export default function FormPage() {
 																sumber: e.target
 																	.value,
 															})
-														}
-													/>
+														}>
+														<option
+															value={-1}
+															disabled>
+															Pilih Sumber
+														</option>
+														{sumber.map((item) => {
+															return (
+																<option
+																	key={
+																		item.id
+																	}
+																	value={
+																		item.sumber
+																	}>
+																	{
+																		item.sumber
+																	}
+																</option>
+															);
+														})}
+													</select>
 													<label htmlFor="inputSumber">
 														Sumber
 													</label>

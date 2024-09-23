@@ -29,6 +29,7 @@ const SideNav = () => {
 		"Lemari",
 		"Barang",
 		"User",
+		"Sumber",
 	];
 
 	useEffect(() => {
@@ -64,7 +65,7 @@ const SideNav = () => {
 					setLemari([]);
 					console.error("Error fetching data:", err);
 				});
-		}
+		};
 		switch (user?.tipe_user) {
 			case "admin":
 				setRole("Admin");
@@ -127,216 +128,268 @@ const SideNav = () => {
 				</Link>
 
 				<div className="sidebar">
-						<div className="user-panel mt-3 pb-3 mb-3 d-flex">
-							<div className="image">
-								<i className="fas fa-user-circle fa-2x"></i>
-							</div>
-							<div className="info">
-								<Link
-									to="#"
-									className="d-block text-decoration-none">
-									{user.name} - {formatString(role)}
-								</Link>
-							</div>
+					<div className="user-panel mt-3 pb-3 mb-3 d-flex">
+						<div className="image">
+							<i className="fas fa-user-circle fa-2x"></i>
 						</div>
+						<div className="info">
+							<Link
+								to="#"
+								className="d-block text-decoration-none">
+								{user.name} - {formatString(role)}
+							</Link>
+						</div>
+					</div>
 
-						<nav className="mt-2">
-							<ul
-								className="nav nav-pills nav-sidebar flex-column"
-								data-widget="treeview"
-								role="menu"
-								data-accordion="false">
-								<li className="nav-item">
-									<Link
-										to="/"
-										className={`nav-link ${
-											location.pathname === "/"
-												? "active"
-												: ""
-										}`}>
-										<i className="nav-icon fas fa-home" />
-										<p>Dashboard</p>
-									</Link>
-								</li>
+					<nav className="mt-2">
+						<ul
+							className="nav nav-pills nav-sidebar flex-column"
+							data-widget="treeview"
+							role="menu"
+							data-accordion="false">
+							<li className="nav-item">
+								<Link
+									to="/"
+									className={`nav-link ${
+										location.pathname === "/"
+											? "active"
+											: ""
+									}`}>
+									<i className="nav-icon fas fa-home" />
+									<p>Dashboard</p>
+								</Link>
+							</li>
 
-								{["admin", "staf_tu"].includes(
-									user.tipe_user
-								) && (
-									<li className="nav-item">
-										<a
-											href="#"
-											className="nav-link">
-											<i className="nav-icon fas fa-door-open" />
-											<p>
-												Ruangan{" "}
-												<i className="fas fa-angle-left right" />
-											</p>
-										</a>
-										<ul className="nav nav-treeview">
-											{ruangan.map((item) => {
-													const slug =
-														item.id;
-													return item.id_jurusan ? null : (
-														<li
-															key={item.id}
-															className="nav-item">
-															<Link
-																to={`/ruangan/${slug}`}
-																className={`nav-link ${
-																	location.pathname ===
-																	`/ruangan/${slug}`
-																		? "active"
-																		: ""
-																}`}>
-																<i className="far fa-circle nav-icon" />
-																<p>
-																	{
-																		item.nama_ruangan
-																	}
-																</p>
-															</Link>
-														</li>
-													);
-												})}
-										</ul>
-									</li>
-								)}
+							{["admin", "staf_tu"].includes(user.tipe_user) && (
 								<li className="nav-item">
-									<a
-										href="#"
-										className="nav-link">
-										<i className="nav-icon fas fa-school" />
+									<a href="#" className="nav-link">
+										<i className="nav-icon fas fa-door-open" />
 										<p>
-											Jurusan{" "}
+											Ruangan{" "}
 											<i className="fas fa-angle-left right" />
 										</p>
 									</a>
 									<ul className="nav nav-treeview">
-										{jurusan.map((item) => {
-												const idJurusan = item.id;
-
-												return (
-													<li
-														key={item.id}
-														className="nav-item">
-														<a
-															href="#"
-															className="nav-link">
-															<i className="nav-icon far fa-circle" />
-															<p>
-																{item.jurusan}
-																<i className="fas fa-angle-left right" />
-															</p>
-														</a>
-														<ul className="nav-treeview">
-															{ruangan.map((r) => {
-																if (r.id_jurusan == item.id) {
-																	const idRuangan = r.id;
-																	return (
-																		<li
-																			key={r.id}
-																			className="nav-item pl-4">
-																			<Link
-																				to={`/ruangan/${idRuangan}`}
-																				className={`nav-link ${
-																					location.pathname.includes(
-																						`${idRuangan}`
-																					)
-																						? "active"
-																						: ""
-																				}`}>
-																				<p>
-																					Ruangan{" "}
-																					{
-																						r.nama_ruangan
-																					}
-																				</p>
-																			</Link>
-																		</li>
-																	)
-																}
-															})}
-														</ul>
-													</li>
-												);
-											})
-										}
+										{ruangan.map((item) => {
+											const slug = item.id;
+											return item.id_jurusan ? null : (
+												<li
+													key={item.id}
+													className="nav-item">
+													<Link
+														to={`/ruangan/${slug}`}
+														className={`nav-link ${
+															location.pathname ===
+															`/ruangan/${slug}`
+																? "active"
+																: ""
+														}`}>
+														<i className="far fa-circle nav-icon" />
+														<p>
+															{item.nama_ruangan}
+														</p>
+													</Link>
+												</li>
+											);
+										})}
 									</ul>
 								</li>
-								<li className="nav-item">
-									<Link
-										to="/pengadaan"
-										className={`nav-link ${
-											location.pathname.includes("/pengadaan")
-												? "active"
-												: ""
-										}`}>
-										<i className="nav-icon fas fa-clipboard-list" />
-										<p>Pengadaan</p>
-									</Link>
-								</li>
-								{user.tipe_user === "admin" && (
-									<li className="nav-header">MASTER</li>
-								)}
-								{["admin"].includes(user.tipe_user) && (
-									<li className="nav-item">
-										<a
-											href="#"
-											className={`nav-link ${
-												location.pathname.includes(
-													"/master"
-												)
-													? "active"
-													: ""
-											}`}>
-											<i className="nav-icon fas fa-database" />
-											<p>
-												Data
-												<i className="fas fa-angle-left right" />
-											</p>
-										</a>
-										<ul className="nav nav-treeview">
-											{masterMenus.map((item, index) => {
-												const slug = item
-													.toLowerCase()
-													.replace(/ /g, "-");
-												return (
-													<li
-														key={index}
-														className="nav-item">
-														<Link
-															to={`/master/${slug}`}
-															className={`nav-link ${
-																location.pathname ===
-																`/master/${slug}`
-																	? "active"
-																	: ""
-															}`}>
-															<i className="far fa-circle nav-icon" />
-															<p>{item}</p>
-														</Link>
-													</li>
-												);
-											})}
-										</ul>
-									</li>
-								)}
-								<li className="nav-header">AKUN</li>
+							)}
+							<li className="nav-item">
+								<a href="#" className="nav-link">
+									<i className="nav-icon fas fa-school" />
+									<p>
+										Jurusan{" "}
+										<i className="fas fa-angle-left right" />
+									</p>
+								</a>
+								<ul className="nav nav-treeview">
+									{jurusan.map((item) => {
+										if (
+											user.tipe_user === "kep_jurusan" &&
+											user.id_jurusan === item.id
+										) {
+											return (
+												<li
+													key={item.id}
+													className="nav-item">
+													<a
+														href="#"
+														className="nav-link">
+														<i className="nav-icon far fa-circle" />
+														<p>
+															{item.jurusan}
+															<i className="fas fa-angle-left right" />
+														</p>
+													</a>
+													<ul className="nav-treeview">
+														{ruangan.map((r) => {
+															if (
+																r.id_jurusan ==
+																item.id
+															) {
+																const idRuangan =
+																	r.id;
+																return (
+																	<li
+																		key={
+																			r.id
+																		}
+																		className="nav-item pl-4">
+																		<Link
+																			to={`/ruangan/${idRuangan}`}
+																			className={`nav-link ${
+																				location.pathname.includes(
+																					`${idRuangan}`
+																				)
+																					? "active"
+																					: ""
+																			}`}>
+																			<p>
+																				Ruangan{" "}
+																				{
+																					r.nama_ruangan
+																				}
+																			</p>
+																		</Link>
+																	</li>
+																);
+															}
+														})}
+													</ul>
+												</li>
+											);
+										} else if (user.tipe_user === "admin") {
+											return (
+												<li
+													key={item.id}
+													className="nav-item">
+													<a
+														href="#"
+														className="nav-link">
+														<i className="nav-icon far fa-circle" />
+														<p>
+															{item.jurusan}
+															<i className="fas fa-angle-left right" />
+														</p>
+													</a>
+													<ul className="nav-treeview">
+														{ruangan.map((r) => {
+															if (
+																r.id_jurusan ==
+																item.id
+															) {
+																const idRuangan =
+																	r.id;
+																return (
+																	<li
+																		key={
+																			r.id
+																		}
+																		className="nav-item pl-4">
+																		<Link
+																			to={`/ruangan/${idRuangan}`}
+																			className={`nav-link ${
+																				location.pathname.includes(
+																					`${idRuangan}`
+																				)
+																					? "active"
+																					: ""
+																			}`}>
+																			<p>
+																				Ruangan{" "}
+																				{
+																					r.nama_ruangan
+																				}
+																			</p>
+																		</Link>
+																	</li>
+																);
+															}
+														})}
+													</ul>
+												</li>
+											);
+										} else {
+											return null;
+										}
+									})}
+								</ul>
+							</li>
+							<li className="nav-item">
+								<Link
+									to="/pengadaan"
+									className={`nav-link ${
+										location.pathname.includes("/pengadaan")
+											? "active"
+											: ""
+									}`}>
+									<i className="nav-icon fas fa-clipboard-list" />
+									<p>Pengadaan</p>
+								</Link>
+							</li>
+							{user.tipe_user === "admin" && (
+								<li className="nav-header">MASTER</li>
+							)}
+							{["admin"].includes(user.tipe_user) && (
 								<li className="nav-item">
 									<a
 										href="#"
-										onClick={onLogout}
-										className="nav-link">
-										<i className="nav-icon fas fa-sign-out-alt" />
-										<p>Log Out</p>
+										className={`nav-link ${
+											location.pathname.includes(
+												"/master"
+											)
+												? "active"
+												: ""
+										}`}>
+										<i className="nav-icon fas fa-database" />
+										<p>
+											Data
+											<i className="fas fa-angle-left right" />
+										</p>
 									</a>
+									<ul className="nav nav-treeview">
+										{masterMenus.map((item, index) => {
+											const slug = item
+												.toLowerCase()
+												.replace(/ /g, "-");
+											return (
+												<li
+													key={index}
+													className="nav-item">
+													<Link
+														to={`/master/${slug}`}
+														className={`nav-link ${
+															location.pathname ===
+															`/master/${slug}`
+																? "active"
+																: ""
+														}`}>
+														<i className="far fa-circle nav-icon" />
+														<p>{item}</p>
+													</Link>
+												</li>
+											);
+										})}
+									</ul>
 								</li>
-							</ul>
-						</nav>
-					</div>
+							)}
+							<li className="nav-header">AKUN</li>
+							<li className="nav-item">
+								<a
+									href="#"
+									onClick={onLogout}
+									className="nav-link">
+									<i className="nav-icon fas fa-sign-out-alt" />
+									<p>Log Out</p>
+								</a>
+							</li>
+						</ul>
+					</nav>
+				</div>
 			</aside>
 		</div>
-	)
+	);
 };
 
 export default SideNav;

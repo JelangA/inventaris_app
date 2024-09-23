@@ -5,6 +5,7 @@ import { getDataJurusan } from "../api/jurusanApi.js";
 import { getDataRuangan } from "../api/ruanganApi.js";
 import { getDataBarang } from "../api/barangApi.js";
 import { getDataUser } from "../api/userApi.js";
+import { getDataSumber } from "../api/sumberApi.js";
 import { getDataLemari } from "../api/lemariApi.js";
 import { getDataPenempatanLemari } from "../api/penempatanLApi.js";
 import { getDataPenempatanRuangan } from "../api/penempatanRApi.js";
@@ -60,6 +61,11 @@ function MasterPage() {
 					break;
 				case "user":
 					await getDataUser().then((res) => {
+						fetchedData = res;
+					});
+					break;
+				case "sumber":
+					await getDataSumber().then((res) => {
 						fetchedData = res;
 					});
 					break;

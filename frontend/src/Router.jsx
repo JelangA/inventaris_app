@@ -52,7 +52,7 @@ const routes = createBrowserRouter([
                 // Add Barang from MasterPage
                 path: '/form/:param/:idRB?', // :param sudah pasti 'barang'
                 element: (
-                    <ProtectedRoute allowedRoles={['admin', 'kep_jurusan', 'kep_bengkel']}>
+                    <ProtectedRoute allowedRoles={['admin']}>
                         <FormPage />
                     </ProtectedRoute>
                 )

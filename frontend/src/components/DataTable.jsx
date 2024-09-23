@@ -45,6 +45,7 @@ import { useStateContext } from "../contexts/ContextProvider.jsx";
 import { useNavigate, Link } from "react-router-dom";
 import { deleteDataPenempatanLemari } from "../api/penempatanLApi.js";
 import { deleteDataPenempatanRuangan } from "../api/penempatanRApi.js";
+import { addDataSumber, deleteDataSumber, editDataSumber } from "../api/sumberApi.js";
 
 const DataTable = ({
 	data,
@@ -371,9 +372,9 @@ const DataTable = ({
 	];
 
 	const lemariColumn = {
-		accessorKey: "id_jurusan",
-		id: "id_jurusan",
-		header: "Jurusan",
+		accessorKey: "id_ruangan",
+		id: "id_ruangan",
+		header: "Ruangan",
 		enableEditing: true,
 		muiEditTextFieldProps: {
 			select: true,
@@ -385,9 +386,9 @@ const DataTable = ({
 					...validationErrors,
 					id_jurusan: undefined,
 				}),
-			children: jurusan.map((j) => (
-				<MenuItem key={j.id} value={j.id}>
-					{j.jurusan}
+			children: ruangan.map((r) => (
+				<MenuItem key={r.id} value={r.id}>
+					{r.nama_ruangan}
 				</MenuItem>
 			)),
 		},
@@ -396,8 +397,8 @@ const DataTable = ({
 				(p) => p.id == cell.row.original.id
 			);
 			if (penempatan) {
-				return jurusan.find((j) => j.id == penempatan.id_jurusan)
-					.jurusan;
+				return ruangan.find((r) => r.id == penempatan.id_ruangan)
+					.nama_ruangan;
 			}
 			return null;
 		},
@@ -468,6 +469,24 @@ const DataTable = ({
 			},
 		},
 	];
+
+	const sumberColumns = [
+		{
+			accessorKey: "sumber",
+			header: "Sumber",
+			enableEditing: true,
+			muiEditTextFieldProps: {
+				required: true,
+				error: !!validationErrors?.sumber,
+				helperText: validationErrors?.sumber,
+				onFocus: () =>
+					setValidationErrors({
+						...validationErrors,
+						sumber: undefined,
+					}),
+			},
+		}
+	]
 
 	const pengadaanColumns = [
 		{
@@ -601,6 +620,12 @@ const DataTable = ({
 				tableType.createFunction = addDataUser;
 				tableType.editFunction = editDataUser;
 				tableType.deleteFunction = deleteDataUser;
+				break;
+			case "sumber":
+				tableType.columns = sumberColumns;
+				tableType.createFunction = addDataSumber;
+				tableType.editFunction = editDataSumber;
+				tableType.deleteFunction = deleteDataSumber;
 				break;
 			case "pengadaan":
 				tableType.columns = pengadaanColumns;
