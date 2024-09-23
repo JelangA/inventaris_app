@@ -160,7 +160,7 @@ const SideNav = () => {
 								</Link>
 							</li>
 
-							{["admin", "staf_tu"].includes(user.tipe_user) && (
+							{["admin"].includes(user.tipe_user) && (
 								<li className="nav-item">
 									<a href="#" className="nav-link">
 										<i className="nav-icon fas fa-door-open" />
