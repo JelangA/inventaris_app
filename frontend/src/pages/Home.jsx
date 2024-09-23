@@ -1,6 +1,34 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useStateContext } from "../contexts/ContextProvider";
+import { getDataUser } from "../api/userApi";
+import { getDataRuangan } from "../api/ruanganApi";
+import { getDataBarang } from "../api/barangApi";
+import { getDataJurusan } from "../api/jurusanApi";
+import { Link } from "react-router-dom";
 
 function Home() {
+    const { user, ruangan, barang, jurusan, setRuangan, setBarang, setJurusan } = useStateContext();
+    const [users, setUsers] = useState([]);
+
+    useEffect(() => {
+        const fetchDataUsers = async () => {
+            await getDataUser().then(res => setUsers(res));
+        }
+        const fetchDataRuangan = async () => {
+            await getDataRuangan.then(res => setRuangan(res));
+        }
+        const fetchDataBarang = async () => {
+            await getDataBarang.then(res => setBarang(res));
+        }
+        const fetchDataJurusan = async () => {
+            await getDataJurusan.then(res => setJurusan(res));
+        }
+        fetchDataUsers();
+        fetchDataRuangan();
+        fetchDataBarang();
+        fetchDataJurusan();
+    }, []);
+
     return (
         <div>
             <div className="content-wrapper">
@@ -15,7 +43,7 @@ function Home() {
                             <div className="col-sm-6">
                                 <ol className="breadcrumb float-sm-right">
                                     <li className="breadcrumb-item"><a href="#">Home</a></li>
-                                    <li className="breadcrumb-item active">Dashboard v1</li>
+                                    <li className="breadcrumb-item active">Dashboard</li>
                                 </ol>
                             </div>
                             {/* /.col */}
@@ -34,14 +62,18 @@ function Home() {
                                 {/* small box */}
                                 <div className="small-box bg-info">
                                     <div className="inner">
-                                        <h3>150</h3>
-                                        <p>New Orders</p>
+                                        <h3>{barang.length}</h3>
+                                        <p>Barang</p>
                                     </div>
                                     <div className="icon">
                                         <i className="ion ion-bag"/>
                                     </div>
-                                    <a href="#" className="small-box-footer">More info <i
-                                        className="fas fa-arrow-circle-right"/></a>
+                                    {
+                                        user.tipe_user === 'admin' && (
+                                            <Link className="small-box-footer" to={'/master/barang'}>More info <i
+                                            className="fas fa-arrow-circle-right"/></Link>
+                                        )
+                                    }
                                 </div>
                             </div>
                             {/* ./col */}
@@ -49,14 +81,18 @@ function Home() {
                                 {/* small box */}
                                 <div className="small-box bg-success">
                                     <div className="inner">
-                                        <h3>53<sup style={{fontSize: 20}}>%</sup></h3>
-                                        <p>Bounce Rate</p>
+                                        <h3>{ruangan.length}</h3>
+                                        <p>Ruangan</p>
                                     </div>
                                     <div className="icon">
                                         <i className="ion ion-stats-bars"/>
                                     </div>
-                                    <a href="#" className="small-box-footer">More info <i
-                                        className="fas fa-arrow-circle-right"/></a>
+                                    {
+                                        user.tipe_user === 'admin' && (
+                                            <Link className="small-box-footer" to={'/master/ruangan'}>More info <i
+                                            className="fas fa-arrow-circle-right"/></Link>
+                                        )
+                                    }
                                 </div>
                             </div>
                             {/* ./col */}
@@ -64,14 +100,18 @@ function Home() {
                                 {/* small box */}
                                 <div className="small-box bg-warning">
                                     <div className="inner">
-                                        <h3>44</h3>
-                                        <p>User Registrations</p>
+                                        <h3>{users.length}</h3>
+                                        <p>Users</p>
                                     </div>
                                     <div className="icon">
                                         <i className="ion ion-person-add"/>
                                     </div>
-                                    <a href="#" className="small-box-footer">More info <i
-                                        className="fas fa-arrow-circle-right"/></a>
+                                    {
+                                        user.tipe_user === 'admin' && (
+                                            <Link className="small-box-footer" to={'/master/user'}>More info <i
+                                            className="fas fa-arrow-circle-right"/></Link>
+                                        )
+                                    }
                                 </div>
                             </div>
                             {/* ./col */}
@@ -79,14 +119,18 @@ function Home() {
                                 {/* small box */}
                                 <div className="small-box bg-danger">
                                     <div className="inner">
-                                        <h3>65</h3>
-                                        <p>Unique Visitors</p>
+                                        <h3>{jurusan.length}</h3>
+                                        <p>Jurusan</p>
                                     </div>
                                     <div className="icon">
                                         <i className="ion ion-pie-graph"/>
                                     </div>
-                                    <a href="#" className="small-box-footer">More info <i
-                                        className="fas fa-arrow-circle-right"/></a>
+                                    {
+                                        user.tipe_user === 'admin' && (
+                                            <Link className="small-box-footer" to={'/master/jurusan'}>More info <i
+                                            className="fas fa-arrow-circle-right"/></Link>
+                                        )
+                                    }
                                 </div>
                             </div>
                             {/* ./col */}
