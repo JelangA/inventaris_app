@@ -14,6 +14,11 @@ module.exports = {
     */
     await queryInterface.bulkInsert('jurusan', [
       {
+        jurusan: 'TU',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
         jurusan: 'RPL',
         createdAt: new Date(),
         updatedAt: new Date(),

@@ -16,38 +16,38 @@ module.exports = {
       {
         nama_ruangan: 'Lab Komputer',
         luas_ruangan: "10x10",
-        id_jurusan: 2,
+        id_jurusan: 3,
       },
       {
         nama_ruangan: 'Lab Web',
         luas_ruangan: "10x10",
-        id_jurusan: 1,
+        id_jurusan: 2,
       },
       {
         nama_ruangan: 'Lab RPL',
         luas_ruangan: "10x10",
-        id_jurusan: 1,
+        id_jurusan: 2,
       },
       {
         nama_ruangan: 'Lab System',
         luas_ruangan: "10x10",
-        id_jurusan: 2,
+        id_jurusan: 3,
       },
       {
         nama_ruangan: 'Mini Office',
         luas_ruangan: "10x10",
-        id_jurusan: 3,
+        id_jurusan: 4,
       },
       {
-        nama_ruangan: 'D1 - A',
-        luas_ruangan: "10x10",
-      },
-      {
-        nama_ruangan: 'D1 - B',
+        nama_ruangan: 'D1',
         luas_ruangan: "10x10",
       },
       {
         nama_ruangan: 'D2',
+        luas_ruangan: "10x10",
+      },
+      {
+        nama_ruangan: 'D3',
         luas_ruangan: "10x10",
       }
     ], {});

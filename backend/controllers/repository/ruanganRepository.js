@@ -4,7 +4,16 @@ const {createItem, updateItem, deleteItem, getById, getAll} = require('../../uti
 const repository = {};
 
 
-repository.create = (req, res) => createItem(Ruangan, req.body, res);
+repository.create = async (req, res)  => {
+    const payload = {
+        nama_ruangan : req.body.nama_ruangan,
+        luas_ruangan: req.body.luas_ruangan,
+        inventaris_sapras: req.body.inventaris_sapras,
+        id_jurusan: req.body.id_jurusan === '' || req.body.id_jurusan === 'Tidak ada jurusan' ? null : req.body.id_jurusan,
+    }
+
+    await createItem(Ruangan, payload, res)
+};
 
 // Update an existing ruangan
 repository.update = (req, res) => updateItem(Ruangan, 'Ruangan', req.params.id, req.body, res);

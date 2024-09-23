@@ -35,11 +35,11 @@ controller.login = async (req, res) => {
 };
 
 controller.register = async (req, res) => {
-    const { name, username, password, tipe_user, no_hp } = req.body;
+    const { name, username, password, tipe_user, no_hp, id_juruasan } = req.body;
 
     try {
         // Validasi input
-        if (!name || !username || !password || !tipe_user) {
+        if (!name || !username || !password || !tipe_user || !id_juruasan) {
             return respon.responseErr(res, 'Semua field harus diisi', 400);
         }
 
@@ -58,7 +58,8 @@ controller.register = async (req, res) => {
             username,
             password: hashedPassword,
             tipe_user,
-            no_hp
+            no_hp,
+            id_juruasan
         });
 
         return respon.response(res, newUser, 201);

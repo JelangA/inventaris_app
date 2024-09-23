@@ -15,7 +15,7 @@ module.exports = {
     */
     await queryInterface.bulkInsert('user', [
       {
-        name: 'John Doe',
+        name: 'admin',
         username: 'admin',
         password: hashSync('admin', 10),  // Password yang di-hash
         tipe_user: 'admin',
@@ -25,9 +25,10 @@ module.exports = {
       },
       {
         name: 'tu',
-        username: 'janesmith',
+        username: 'tu',
         password: hashSync('tu', 10),  // Password yang di-hash
         tipe_user: 'staf_tu',
+        id_jurusan: 1,
         no_hp: '081234567891',
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -38,7 +39,7 @@ module.exports = {
         password: hashSync('rpl', 10),  // Password yang di-hash
         tipe_user: 'kep_jurusan',
         no_hp: '081234567892',
-        id_jurusan: 1, // Teknik Elektro
+        id_jurusan: 2, // Teknik Elektro
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -48,7 +49,7 @@ module.exports = {
         password: hashSync('tkj', 10),  // Password yang di-hash
         tipe_user: 'kep_jurusan',
         no_hp: '081234567892',
-        id_jurusan: 2, // Teknik Elektro
+        id_jurusan: 3, // Teknik Elektro
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -58,7 +59,7 @@ module.exports = {
         password: hashSync('otkp', 10),  // Password yang di-hash
         tipe_user: 'kep_jurusan',
         no_hp: '081234567892',
-        id_jurusan: 3, // Teknik Elektro
+        id_jurusan: 4, // Teknik Elektro
         createdAt: new Date(),
         updatedAt: new Date(),
       },
