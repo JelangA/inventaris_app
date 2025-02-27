@@ -19,7 +19,7 @@ router.use("/user", require("./documentation/userRoutes"));
 router.use("/lemari", require("./documentation/lemariRoutes"));
 router.use("/galeriRuangan", require("./documentation/galeriRuanganRoutes"));
 router.use("/penempatanRuangan", require("./documentation/penempatanRRoutes"));
-router.use("/penempatanLemari", require("./documentation/PenempatanLRoutes"));
+router.use("/penempatanLemari", require("./documentation/penempatanLRoutes"));
 router.use("/sumber", require("./documentation/sumberRoutes"));
 
 module.exports = router;
