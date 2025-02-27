@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const PenempatanLController = require('../../controllers/repository/PenempatanLRepository');
+const PenempatanLController = require('../../controllers/repository/penempatanLRepository');
 
 
 router.get('/', PenempatanLController.getAll);
